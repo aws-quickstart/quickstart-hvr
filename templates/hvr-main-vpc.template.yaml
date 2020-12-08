@@ -12,6 +12,13 @@ AWSTemplateFormatVersion: 2010-09-09
 # Added ASG for EC2 Instance creation which will be behind NLB
 # 2020-10-09
 # Added Default parameters to Redshift and Postgres so if not selected the template will continue properly
+# 2020-11-12
+# Added temp AWS S3 Parameters to troubleshoot Redshift deployment issues.  
+# 2020-11-30
+# Removed Redshift Resource Creation
+# Use new HVR stack to build Agent env
+# 2020-12-03
+# Added EC2 instance type for HUB vs Agent
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -34,7 +41,8 @@ Metadata:
         default: "HVR EC2 Configuration"
       Parameters:
       - AmazonLinuxAMI
-      - HVRInstanceType
+      - HVRInstanceTypeHUB
+      - HVRInstanceTypeAgent
       - KeyName
       - HvrUsername
       - HvrPort
@@ -42,6 +50,15 @@ Metadata:
         default: "HVR EC2 EFS Configuration"
       Parameters:
       - VolumeName
+    - Label:
+        default: Tag identifiers
+      Parameters:
+      - TagEnvironment
+      - TagName
+    - Label:
+        default: SNS Notification E-Mail
+      Parameters:
+      - NotificationList
     - Label:
         default: HVR Aurora/PostgreSQL configuration
       Parameters:
@@ -52,44 +69,11 @@ Metadata:
       - PGMasterUserPassword
       - PGDBPort
     - Label:
-        default: HVR Redshift Cluster Configuration
-      Parameters:
-      - EnableRedshiftStack
-      - RedshiftDBName
-      - RedshiftDBPort
-      - RedshiftNodeType
-      - RedshiftNumberOfNodes
-      - RedshiftMasterUsername
-      - RedshiftMasterUserPassword
-      - RedshiftEnableLoggingToS3
-      - RedshiftMaxConcurrentCluster
-      - RedshiftEncryptionAtRest
-      - Redshiftkmskey
-      - RedshiftS3BucketForIAMRole
-      - RedshiftMaintenancewindow
-      - RedshiftSnapshotIdentifier
-      - RedshiftSnapshotAccountNumber
-    - Label:
         default: AWS Quick Start configuration S3 Bucket/Prefix
       Parameters:
       - QSS3BucketRegion
       - QSS3BucketName
       - QSS3KeyPrefix
-    - Label:
-        default: HVR configuration S3 Bucket/Prefix # Temp until QS Bucket is created
-      Parameters:
-      - HVRS3BucketRegion
-      - HVRS3BucketName
-      - HVRS3KeyPrefix
-    - Label:
-        default: Tag identifiers
-      Parameters:
-      - TagEnvironment
-      - TagName
-    - Label:
-        default: SNS Notification E-Mail
-      Parameters:
-      - NotificationList
 
     ParameterLabels:
       AcceptedEULA:
@@ -108,8 +92,10 @@ Metadata:
         default: Private CIDR Block AZ 2
       SourceCIDR:
         default: Allowed external access CIDR
-      HVRInstanceType:
-        default: HVR EC2 instance type
+      HVRInstanceTypeHUB:
+        default: HVR EC2 instance type for HVR HUB
+      HVRInstanceTypeAgent:
+        default: HVR EC2 instance type for HVR Agent
       KeyName:
         default: Key pair name
       HvrUsername:
@@ -118,6 +104,8 @@ Metadata:
         default: HVR Hub Shared Config Volume name
       HvrPort:
         default: HVR Listener Port
+      NotificationList:
+        default: SNS notification email
       EnablePGStack:
         default: Do you want to create Aurora Postgres stack?
       PGInstanceClass:
@@ -130,36 +118,6 @@ Metadata:
         default: Aurora/PostgreSQL master username
       PGMasterUserPassword:
         default: Aurora/PostgreSQL master password
-      EnableRedshiftStack:
-        default: Do you want to create Redshift cluster stack?
-      RedshiftDBName:
-        default: Redshift database name
-      RedshiftDBPort:
-        default: Redshift cluster port
-      RedshiftNodeType:
-        default: Node type for Redshift cluster
-      RedshiftNumberOfNodes:
-        default: Number of nodes in Redshift cluster
-      RedshiftMasterUsername:
-        default: Redshift master user name
-      RedshiftMasterUserPassword:
-        default: Redshift master user password
-      RedshiftEnableLoggingToS3:
-        default: Enable Redshift logging to S3
-      RedshiftMaxConcurrentCluster:
-        default: Max. number of concurrent clusters
-      RedshiftEncryptionAtRest:
-        default: Encryption at rest
-      Redshiftkmskey:
-        default: KMS key ID
-      RedshiftS3BucketForIAMRole:
-        default: Amazon S3 bucket for Redshift IAM role
-      RedshiftMaintenancewindow:
-        default: Maintenance window
-      RedshiftSnapshotIdentifier:
-        default: Redshift snapshot identifier
-      RedshiftSnapshotAccountNumber:
-        default: AWS account-ID of the Redshift Snapshot
       TagEnvironment:
         default: Environment
       TagName:
@@ -170,16 +128,8 @@ Metadata:
         default: Quick Start S3 bucket name
       QSS3KeyPrefix:
         default: Quick Start S3 key prefix
-      HVRS3BucketRegion:
-        default: S3 Region for HVR S3 Bucket
-      HVRS3BucketName:
-        default: HVR S3 bucket name
-      HVRS3KeyPrefix:
-        default: HVR S3 key prefix
-      NotificationList:
-        default: SNS notification email
 
-  License: Apache-2.0      
+  License: Apache-2.0
 
 Parameters:
   AcceptedEULA:
@@ -240,11 +190,18 @@ Parameters:
     Description: CIDR block for private subnet 2 located in Availability Zone 2
     Type: String
   
-  HVRInstanceType:
-    Description: Compute Based EC2 instance
+  HVRInstanceTypeHUB:
+    Description: General Purpose EC2 instance - Recommended for HUB only Instances
     Type: String
-    Default: t2.medium
-    AllowedValues: [t2.medium, t2.large, t2.xlarge, t2.2xlarge, c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge, m4.xlarge, m4.2xlarge, m4.4xlarge]
+    Default: m4.xlarge
+    AllowedValues: [m4.xlarge, m4.2xlarge, m4.4xlarge, t2.medium, t2.large, t2.xlarge, t2.2xlarge]
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  HVRInstanceTypeAgent:
+    Description: Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate
+    Type: String
+    Default: c4.xlarge
+    AllowedValues: [c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge]
     ConstraintDescription: Must be a valid EC2 instance type.
 
   KeyName:
@@ -270,23 +227,6 @@ Parameters:
     Type: String
     MinLength: '1'
     Default: HVREFS
-
-  HVRS3BucketRegion:
-    Default: 'us-west-2'
-    Description: 'The AWS Region where the HVR S3 bucket (HVRS3BucketName) is hosted. When using your own bucket, you must specify this value.'
-    Type: String
-  HVRS3BucketName:
-    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
-    ConstraintDescription: "HVR S3 bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Default: 'quickstart-hvr-dev'
-    Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Type: String
-  HVRS3KeyPrefix:
-    AllowedPattern: "^[0-9a-zA-Z-/]*$"
-    ConstraintDescription: "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
-    Default: 'quickstart-hvr-templates/'
-    Description: "The S3 key prefix for the HVR assets. The key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
-    Type: String
   
   NotificationList:
     Type: String
@@ -347,106 +287,6 @@ Parameters:
     MinValue: 1150
     Type: Number
 
-  EnableRedshiftStack:
-    AllowedValues:
-      - "true"
-      - "false"
-    Default: "true"
-    Description: Enables or disables creation of an Amazon Redshift stack. If true, an Amazon Redshift stack will be created.
-    Type: String
-
-  RedshiftDBName:
-    Description: The name of the first database to be created when the cluster is created.
-    Type: String
-    Default: hvr
-    AllowedPattern: "([a-z]|[0-9])+"
-    ConstraintDescription: must contain a-z or 0-9 only.
-
-  RedshiftDBPort:
-    Description: The port number on which the cluster accepts incoming connections.
-    Type: String
-    Default: '8200'
-
-  RedshiftNodeType:
-    Description: The type of node to be provisioned
-    Type: String
-    Default: dc2.large
-    AllowedValues:
-      - dc2.large
-      - dc2.8xlarge
-      - ds2.xlarge
-      - ds2.8xlarge
-    ConstraintDescription: must be a valid Amazon Redshift node type.
-
-  RedshiftNumberOfNodes:
-    Description: The number of compute nodes in the Amazon Redshift cluster.
-    Type: Number
-    Default: '2'
-
-  RedshiftMasterUsername:
-    Description: The user name that is associated with the master user account for the cluster that is being created.
-    Type: String
-    Default: hvruser
-    AllowedPattern: '([a-z])([a-z]|[0-9])*'
-    ConstraintDescription: must start with a-z and contain only a-z or 0-9.
-
-  RedshiftMasterUserPassword:
-    Description: "Change the Default Redshift master user password. Min 8 chars, must include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
-    Type: String
-    Default: Redshift#!1
-    NoEcho: true
-    MinLength: '8'
-    MaxLength: '64'
-    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
-    ConstraintDescription: "Change the Default Password: Min 8 chars, must include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
-
-  RedshiftEnableLoggingToS3:
-    Default: 'false'
-    Type: String
-    AllowedValues:
-      - true
-      - false
-    Description: Enables or disables logging to an S3 bucket.  To enable logging, select true.
-
-  RedshiftMaxConcurrentCluster:
-    Description: The maximum number of concurrency scaling Amazon Redshift clusters.
-    Type: String
-    Default: '1'
-
-  RedshiftEncryptionAtRest:
-    Description: Enables or disables encryption at rest of the Amazon Redshift database.
-    Type: String
-    Default: 'false'
-    AllowedValues:
-      - true
-      - false
-    ConstraintDescription: must be true or false.
-
-  Redshiftkmskey:
-    Description: The existing KMS key ID for encrypting Amazon Redshift database at-rest.
-    Type: String
-    Default: ''
-
-  RedshiftS3BucketForIAMRole:
-    Type: String
-    Description: An existing Amazon S3 bucket. An IAM role will be created and associated to the Amazon Redshift cluster with GET and LIST access to this bucket.
-    Default: 'hvrbucket'
-
-  RedshiftMaintenancewindow:
-    Description: The maintenance window for the Amazon Redshift cluster.
-    Type: String
-    Default: 'sat:05:00-sat:05:30'
-
-  RedshiftSnapshotIdentifier:
-    Description: The Redshift snapshot identifier. Leave this blank for a new cluster. Enter the snapshot identifier, only if you want to restore from a snapshot.
-    Type: String
-    Default: ''
-
-  RedshiftSnapshotAccountNumber:
-    Description: The AWS account number where the Amazon Redshift snapshot was created. Leave this blank, if the snapshot was created in the current AWS account.
-    Type: String
-    Default: ''
-
   TagName:
     Type: String
     Description: 'The unique friendly name as required by your company’s tagging strategy document, which will be added to the tag.'
@@ -470,13 +310,13 @@ Parameters:
   QSS3BucketName:
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
     ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Default: 'aws-quickstart'
+    Default: 'quickstart-hvr'
     Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: "^[0-9a-zA-Z-/]*$"
     ConstraintDescription: "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
-    Default: quickstart-aws-vpc/
+    Default: templates/
     Description: "The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
     Type: String
 
@@ -484,22 +324,13 @@ Conditions:
   IsGovCloud: !Equals
     - !Ref 'AWS::Region'
     - us-gov-west-1
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'aws-quickstart']
-  CreateRedshiftStack: !Equals
-    - !Ref EnableRedshiftStack
-    - "true"  
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'quickstart-hvr']
   CreatePGStack: !Equals
     - !Ref EnablePGStack
     - "true"
   IsAcceptedEULA: !Equals 
     - !Ref AcceptedEULA
     - "yes"
-  ConditionEULAandRS:  !And
-    - Condition: IsAcceptedEULA
-    - Condition: CreateRedshiftStack
-  ConditionEULAandPG:  !And
-    - Condition: IsAcceptedEULA
-    - Condition: CreatePGStack
 
 ## How to Describe Instances:
 # for region in `aws ec2 describe-regions --output text | cut -f4`
@@ -559,9 +390,15 @@ Resources:
     Properties:
       TemplateURL:
         !Sub
-          - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}/templates/aws-vpc.template
-          - S3Region: !If [UsingDefaultBucket, !Ref 'AWS::Region', !Ref QSS3BucketRegion]
-            S3Bucket: !If [UsingDefaultBucket, !Sub '${QSS3BucketName}-${AWS::Region}', !Ref QSS3BucketName]
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}/submodules/quickstart-aws-vpc/aws-vpc.template.yaml
+        - S3Bucket: !If
+            - UsingDefaultBucket
+            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Ref 'QSS3BucketName'
+          S3Region: !If
+            - UsingDefaultBucket
+            - !Ref 'AWS::Region'
+            - !Ref 'QSS3BucketRegion'
       Parameters:
         AvailabilityZones: !Join 
           - ','
@@ -579,12 +416,18 @@ Resources:
     DependsOn: VPCStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub
-        #- https://${HVRS3BucketName}.${HVRS3BucketRegion}.amazonaws.com/${HVRS3KeyPrefix}hvr.multiaz.template.yaml
-        # Hardcode for now
-        https://quickstart-hvr-dev.s3-us-west-2.amazonaws.com/quickstart-hvr-templates/hvr.multiaz.template.yaml
-        #- QSS3BucketRegion: !If [IsGovCloud, s3-us-gov-west-1 , s3]
-      Parameters:
+      TemplateURL:
+        !Sub
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}hvr.workload.ah.template.yaml
+        - S3Bucket: !If
+            - UsingDefaultBucket
+            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Ref 'QSS3BucketName'
+          S3Region: !If
+            - UsingDefaultBucket
+            - !Ref 'AWS::Region'
+            - !Ref 'QSS3BucketRegion'
+      Parameters:    
         AcceptedEULA: !Ref AcceptedEULA
         #AvailabilityZones: !Ref AvailabilityZones
         SourceCIDR: !Ref SourceCIDR
@@ -603,7 +446,8 @@ Resources:
         PrivateSubnet2: !GetAtt 
           - VPCStack
           - Outputs.PrivateSubnet2AID
-        HVRInstanceType: !Ref HVRInstanceType
+        HVRInstanceTypeHUB: !Ref HVRInstanceTypeHUB
+        HVRInstanceTypeAgent: !Ref HVRInstanceTypeAgent
         KeyName: !Ref KeyName
         HvrUsername: !Ref HvrUsername
         HvrPort: !Ref HvrPort
@@ -614,9 +458,17 @@ Resources:
     DependsOn: VPCStack
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: !Sub
-        - https://quickstart-hvr-dev.s3-us-west-2.amazonaws.com/quickstart-hvr-templates/aurora_postgres.template.yaml
-        - QSS3BucketRegion: !If [IsGovCloud , s3-us-gov-west-1 , s3]
+      TemplateURL:
+        !Sub
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}/submodules/quickstart-amazon-aurora-postgresql/templatesaurora_postgres.template.yaml
+        - S3Bucket: !If
+            - UsingDefaultBucket
+            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Ref 'QSS3BucketName'
+          S3Region: !If
+            - UsingDefaultBucket
+            - !Ref 'AWS::Region'
+            - !Ref 'QSS3BucketRegion'
       Parameters:
         Subnet1ID: !GetAtt 
           - VPCStack
@@ -643,49 +495,6 @@ Resources:
         NotificationList: !Ref NotificationList
         EnvironmentStage: !Ref TagEnvironment
 
-  RedshiftStack:
-    Condition: CreateRedshiftStack
-    DependsOn: VPCStack
-    Type: AWS::CloudFormation::Stack
-    Properties:
-      TemplateURL: !Sub
-        - https://quickstart-hvr-dev.s3-us-west-2.amazonaws.com/quickstart-hvr-templates/redshift.template.yaml
-        - QSS3BucketRegion: !If [IsGovCloud, s3-us-gov-west-1 , s3]
-      Parameters:
-        Subnet1ID: !GetAtt 
-          - VPCStack
-          - Outputs.PrivateSubnet1AID
-        Subnet2ID: !GetAtt 
-          - VPCStack
-          - Outputs.PrivateSubnet2AID
-        VPCID: !GetAtt 
-          - VPCStack
-          - Outputs.VPCID
-        RemoteAccessCIDR: !Ref SourceCIDR
-        PubliclyAccessible: 'false'
-        DatabaseName: !Ref RedshiftDBName
-        RedshiftClusterPort: !Ref RedshiftDBPort
-        NumberOfNodes: !Ref RedshiftNumberOfNodes
-        NodeType: !Ref RedshiftNodeType
-        MasterUsername: !Ref RedshiftMasterUsername
-        MasterUserPassword: !Ref RedshiftMasterUserPassword
-        Maintenancewindow: !Ref RedshiftMaintenancewindow
-        MaxConcurrentCluster: !Ref RedshiftMaxConcurrentCluster
-        EncryptionAtRest: !Ref RedshiftEncryptionAtRest
-        kmskey: !Ref Redshiftkmskey
-        SnapshotIdentifier: !Ref RedshiftSnapshotIdentifier
-        SnapshotAccountNumber: !Ref RedshiftSnapshotAccountNumber
-        NotificationList: !Ref NotificationList
-        EnableLoggingToS3: !Ref RedshiftEnableLoggingToS3
-        S3BucketForRedshiftIAMRole: !Ref RedshiftS3BucketForIAMRole
-        GlueCatalogDatabase: ''
-        QSS3BucketRegion: !Ref QSS3BucketRegion
-        QSS3BucketName: !Ref QSS3BucketName
-        QSS3KeyPrefix: !Ref QSS3KeyPrefix
-        TagName: !Ref TagName
-        TagEnvironment: !Ref TagEnvironment
-
-# List of Outputs **TODO: Add Nested Stack Outputs
 Outputs:
   HvrPort:
     Description: Port of the HVR Agent
@@ -714,18 +523,30 @@ Outputs:
       Fn::GetAtt:
         - HVRStack
         - Outputs.MountTargetID2
-  NLBID:
-    Description: Network Load Balance ID
+  NLBHUBID:
+    Description: Network Load Balance ID HUB
     Value:
       Fn::GetAtt:
         - HVRStack
-        - Outputs.NLBID
-  NLBTargetID:
-    Description: Network Load Balance Target Group ID
+        - Outputs.NLBHUBID
+  NLBHUBTargetID:
+    Description: Network Load Balance Target Group ID HUB
     Value:
       Fn::GetAtt:
         - HVRStack
-        - Outputs.NLBTargetID
+        - Outputs.NLBHUBTargetID
+  NLBAGENTID:
+    Description: Network Load Balance ID HUB
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.NLBAGENTID
+  NLBAGENTTargetID:
+    Description: Network Load Balance Target Group ID HUB
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.NLBAGENTTargetID
   RDSEndpoint:
     Description: Aurora Postgres Endpoint
     Condition: CreatePGStack
@@ -744,18 +565,3 @@ Outputs:
     Description: RDS Database Name
     Condition: CreatePGStack
     Value: !Ref PGDBName
-  RedshiftClusterEndpoint:
-    Condition: CreateRedshiftStack
-    Description: Redshift Cluster endpoint
-    Value:
-      Fn::GetAtt:
-      - RedshiftStack
-      - Outputs.RedshiftClusterEndpoint
-  RedshiftClusterUser:
-    Condition: CreateRedshiftStack
-    Description: Redshift Cluster Username
-    Value: !Ref RedshiftMasterUsername
-  RedshiftClusterDatabase:
-    Condition: CreateRedshiftStack
-    Description: Redshift Cluster Database Name
-    Value: !Ref RedshiftDBName

@@ -1,0 +1,582 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+# This runs HVR on an EC2 instance from Marketplace as a Linux service
+# Uses existing VPC for resource deployment
+# 2020-07-20
+# Adds EFS mount to EC2 Hub Instances
+# 2020-07-24
+# Adds Network Load Balancer to support Multi-AZ environment for HA
+# 2020-07-28
+# Separated HVR into its own nested stack and this template calls the nested stacks
+# 2020-09-24
+# Added ASG for EC2 Instance creation which will be behind NLB
+# 2020-10-09
+# Added Default parameters to Redshift and Postgres so if not selected the template will continue properly
+# 2020-11-12
+# Added temp AWS S3 Parameters to troubleshoot Redshift deployment issues.  
+# 2020-11-30
+# Removed Redshift Resource Creation
+# Use new HVR stack to build Agent env
+# 2020-12-03
+# Added EC2 instance type for HUB vs Agent
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+    - Label:
+        default: End User License Agreement (EULA) - HVR CDC
+      Parameters:
+      - AcceptedEULA
+    - Label:
+        default: "VPC network configuration"
+      Parameters:
+      - AvailabilityZones
+      - VPCCIDR
+      - PublicSubnet1CIDR
+      - PublicSubnet2CIDR
+      - PrivateSubnet1CIDR
+      - PrivateSubnet2CIDR
+      - SourceCIDR
+    - Label:
+        default: "HVR EC2 Configuration"
+      Parameters:
+      - AmazonLinuxAMI
+      - HVRInstanceTypeHUB
+      - HVRInstanceTypeAgent
+      - KeyName
+      - HvrUsername
+      - HvrPort
+    - Label:
+        default: "HVR EC2 EFS Configuration"
+      Parameters:
+      - VolumeName
+    - Label:
+        default: Tag identifiers
+      Parameters:
+      - TagEnvironment
+      - TagName
+    - Label:
+        default: SNS Notification E-Mail
+      Parameters:
+      - NotificationList
+    - Label:
+        default: HVR Aurora/PostgreSQL configuration
+      Parameters:
+      - EnablePGStack
+      - PGInstanceClass
+      - PGDBName
+      - PGMasterUsername
+      - PGMasterUserPassword
+      - PGDBPort
+    - Label:
+        default: AWS Quick Start configuration S3 Bucket/Prefix
+      Parameters:
+      - QSS3BucketRegion
+      - QSS3BucketName
+      - QSS3KeyPrefix
+
+    ParameterLabels:
+      AcceptedEULA:
+        default: Accepted EULA from AWS Marketplace
+      AvailabilityZones:
+        default: Availability Zones
+      VPCCIDR:
+        default: CIDR Block for the VPC 
+      PublicSubnet1CIDR:
+        default: Public CIDR Block AZ 1
+      PublicSubnet2CIDR:
+        default: Public CIDR Block AZ 2
+      PrivateSubnet1CIDR:
+        default: Private CIDR Block AZ 1
+      PrivateSubnet2CIDR:
+        default: Private CIDR Block AZ 2
+      SourceCIDR:
+        default: Allowed external access CIDR
+      HVRInstanceTypeHUB:
+        default: HVR EC2 instance type for HVR HUB
+      HVRInstanceTypeAgent:
+        default: HVR EC2 instance type for HVR Agent
+      KeyName:
+        default: Key pair name
+      HvrUsername:
+        default: HVR User
+      VolumeName:
+        default: HVR Hub Shared Config Volume name
+      HvrPort:
+        default: HVR Listener Port
+      NotificationList:
+        default: SNS notification email
+      EnablePGStack:
+        default: Do you want to create Aurora Postgres stack?
+      PGInstanceClass:
+        default: Aurora/PostgreSQL instance class
+      PGDBName:
+        default: Aurora/PostgreSQL database name
+      PGDBPort:
+        default: Aurora/PostgreSQL database port
+      PGMasterUsername:
+        default: Aurora/PostgreSQL master username
+      PGMasterUserPassword:
+        default: Aurora/PostgreSQL master password
+      TagEnvironment:
+        default: Environment
+      TagName:
+        default: Unique friendly name
+      QSS3BucketRegion:
+        default: S3 Region for S3 Bucket
+      QSS3BucketName:
+        default: Quick Start S3 bucket name
+      QSS3KeyPrefix:
+        default: Quick Start S3 Key prefix
+
+  License: Apache-2.0
+
+Parameters:
+  AcceptedEULA:
+    AllowedValues:
+      - "yes"
+      - "no"
+    Default: "yes"
+    Description: >-
+        PLEASE READ THE HVR SOFTWARE LICENSE AGREEMENT (https://www.hvr-software.com/license-agreement/) CAREFULLY BEFORE USING THE SOFTWARE.
+        The HVR stack can be created only if you have already accepted the EULA. To accept the EULA, see https://aws.amazon.com/marketplace/pp/B077YM8HPW.
+    Type: String
+  
+  AvailabilityZones:
+   Description: >-
+      List of Availability Zones to use for the subnets in the VPC. Only two
+      Availability Zones are used for this deployment, and the logical order of
+      your selections is preserved.
+   Type: 'List<AWS::EC2::AvailabilityZone::Name>'
+
+  SourceCIDR:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
+    Description: The CIDR address from which you will connect to the instance.
+    Type: String
+
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+    Type: String
+
+  PublicSubnet1CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.128.0/20
+    Description: CIDR block for the public subnet 1 located in Availability Zone 1 - HVR will be deployed here
+    Type: String
+  
+  PublicSubnet2CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.144.0/20
+    Description: CIDR block for the public subnet 1 located in Availability Zone 2 - HVR will be deployed here for HA instance
+    Type: String
+  
+  PrivateSubnet1CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/19
+    Description: CIDR block for private subnet 1 located in Availability Zone 1
+    Type: String
+  
+  PrivateSubnet2CIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.32.0/19
+    Description: CIDR block for private subnet 2 located in Availability Zone 2
+    Type: String
+  
+  HVRInstanceTypeHUB:
+    Description: General Purpose EC2 instance - Recommended for HUB only Instances
+    Type: String
+    Default: m4.xlarge
+    AllowedValues: [m4.xlarge, m4.2xlarge, m4.4xlarge, t2.medium, t2.large, t2.xlarge, t2.2xlarge]
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  HVRInstanceTypeAgent:
+    Description: Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate
+    Type: String
+    Default: c4.xlarge
+    AllowedValues: [c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge]
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+
+  HvrUsername:
+    Description: The user name for HVR on EC2 Instance
+    Type: String
+    Default: hvruser
+    AllowedPattern: "([a-z])([a-z]|[0-9])*"
+
+  HvrPort:
+    Description: The Port Number for HVR on EC2 Instance. Also the listner port for the NLB.
+    Type: Number
+    Default: 4343
+    MinValue: 1150
+    MaxValue: 65535
+  
+  VolumeName:
+    Description: The name to be used for the EFS volume
+    Type: String
+    MinLength: '1'
+    Default: HVREFS
+  
+  NotificationList:
+    Type: String
+    Default: 'ops@company.com'
+    Description: The email notification that is used to configure an SNS topic for sending an Amazon CloudWatch alarm and Amazon RDS event notifications.
+    AllowedPattern: '^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$'
+    ConstraintDescription: provide a valid email address.  
+
+  EnablePGStack:
+    AllowedValues:
+      - "true"
+      - "false"
+    Default: "true"
+    Description: Enables or disables creation of an Amazon Aurora Postgres RDS stack. If true, an Amazon Aurora Postgres RDS stack will be created.
+    Type: String
+
+  PGInstanceClass:
+    AllowedValues:
+      - db.r5.large
+      - db.r5.xlarge
+      - db.r5.2xlarge
+      - db.r5.4xlarge
+      - db.r5.12xlarge
+      - db.r5.24xlarge
+      - db.r4.large
+      - db.r4.xlarge
+      - db.r4.2xlarge
+      - db.r4.4xlarge
+      - db.r4.8xlarge
+      - db.r4.16xlarge
+    Default: db.r5.large
+    Description: The Aurora/PostgreSQL database instance class.
+    Type: String
+  
+  PGDBName:
+    AllowedPattern: "([a-z]|[0-9])+"
+    Default: hvrhub
+    Description: The Aurora/PostgreSQL database name for the HVR repository.
+    Type: String
+  
+  PGMasterUsername:
+    AllowedPattern: "^[a-zA-Z]{1}[a-z0-9]*"
+    Default: hvruser
+    Description: The user name that is associated with the master user account for the Aurora DB that is being created.
+    Type: String
+  
+  PGMasterUserPassword:
+    AllowedPattern: '(?=^.{6,255}$)((?=.*\\d)(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[^A-Za-z0-9])(?=.*[a-z])|(?=.*[^A-Za-z0-9])(?=.*[A-Z])(?=.*[a-z])|(?=.*\\d)(?=.*[A-Z])(?=.*[^A-Za-z0-9]))^.*'
+    Default: Postgres#!1
+    Description: "Change the Default Aurora/PostgreSQL master user password. Min 8 chars, must include 1 uppercase, 1 lowercase, 1 number, 1 (non / @ \" ') symbol"
+    NoEcho: true
+    Type: String
+  
+  PGDBPort:
+    Default: 5432
+    Description: The port number on which the Aurora/PostgreSQL database accepts incoming connections.
+    MaxValue: 65535
+    MinValue: 1150
+    Type: Number
+
+  TagName:
+    Type: String
+    Description: 'The unique friendly name as required by your company’s tagging strategy document, which will be added to the tag.'
+    Default: 'hvr-qs'
+
+  TagEnvironment:
+    Type: String
+    AllowedValues:
+      - dev
+      - test
+      - pre-prod
+      - prod
+      - none
+    Description: Designates the environment stage of the associated AWS resource.
+    Default: 'dev'
+
+  QSS3BucketRegion:
+    Default: 'us-east-1'
+    Description: 'The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.'
+    Type: String
+  QSS3BucketName:
+    AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
+    ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
+    Default: 'quickstart-aws-hvr'
+    Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
+    Type: String
+  QSS3KeyPrefix:
+    AllowedPattern: "^[0-9a-zA-Z-/]*$"
+    ConstraintDescription: "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
+    Default: quickstart-hvr/
+    Description: "The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
+    Type: String
+
+Conditions:
+  IsGovCloud: !Equals
+    - !Ref 'AWS::Region'
+    - us-gov-west-1
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'quickstart-aws-hvr']
+  CreatePGStack: !Equals
+    - !Ref EnablePGStack
+    - "true"
+  IsAcceptedEULA: !Equals 
+    - !Ref AcceptedEULA
+    - "yes"
+
+## How to Describe Instances:
+# for region in `aws ec2 describe-regions --output text | cut -f4`
+# do
+#     echo -e "$region:"
+#     aws ec2 describe-images --region $region --owners aws-marketplace --filters "Name=name, Values=*hvr-5.6.0.22-five*" --query 'Images[*].{AMI: ImageId}' --output text
+# done
+##
+
+Mappings:
+  RegionMap:
+    eu-north-1:
+      AMI: ami-0bad5f6f8f93f9518
+    eu-south-1:
+      AMI: ami-099fbb082f655b07e
+    ap-south-1:
+      AMI: ami-0c4eaea53a28fb874
+    eu-west-3:
+      AMI: ami-07a85364c0366826a
+    eu-west-2:
+      AMI: ami-084acc638e8f07e82
+    eu-west-1:
+      AMI: ami-060035f449af08d4e
+    ap-northeast-2:
+      AMI: ami-07a595f9994b0cf0b
+    ap-northeast-1:
+      AMI: ami-048c75b99c006306b
+    sa-east-1:
+      AMI: ami-0b22abbd3ad317099
+    ca-central-1:
+      AMI: ami-04794113699ddc113
+    ap-east-1:
+      AMI: ami-039a8a9e46013e1ec
+    ap-southeast-1:
+      AMI: ami-03bc4fb81ba17c091
+    ap-southeast-2:
+      AMI: ami-0d0c518ff9dfaf290
+    eu-central-1:
+      AMI: ami-05c6b7d21fc91395f
+    us-east-1:
+      AMI: ami-06e078c4511b72322
+    us-east-2:
+      AMI: ami-0cf76483cc02e93b3
+    us-west-1:
+      AMI: ami-020b8f751a027b030
+    us-west-2:
+      AMI: ami-0701373387da8587a
+    me-south-1:
+      AMI: ami-05be64f07423e740a
+    af-south-1:
+      AMI: ami-0ea3184595e827989
+
+Resources:
+## Nested Resources - VPC, HVR and Aurora PostgreSQL
+  VPCStack:
+    Type: 'AWS::CloudFormation::Stack'
+    Properties:
+      TemplateURL:
+        !Sub
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml
+        - S3Bucket: !If
+            - UsingDefaultBucket
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
+            - !Ref 'QSS3BucketName'
+          S3Region: !If
+            - UsingDefaultBucket
+            - !Ref 'AWS::Region'
+            - !Ref 'QSS3BucketRegion'
+      Parameters:
+        AvailabilityZones: !Join 
+          - ','
+          - !Ref AvailabilityZones
+        KeyPairName: !Ref KeyName
+        NumberOfAZs: '2'
+        PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
+        PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
+        PublicSubnet1CIDR: !Ref PublicSubnet1CIDR
+        PublicSubnet2CIDR: !Ref PublicSubnet2CIDR
+        VPCCIDR: !Ref VPCCIDR
+
+  HVRStack:
+    Condition: IsAcceptedEULA
+    DependsOn: VPCStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.ah.template.yaml
+        - S3Bucket: !If
+            - UsingDefaultBucket
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
+            - !Ref 'QSS3BucketName'
+          S3Region: !If
+            - UsingDefaultBucket
+            - !Ref 'AWS::Region'
+            - !Ref 'QSS3BucketRegion'
+      Parameters:
+        AcceptedEULA: !Ref AcceptedEULA
+        #AvailabilityZones: !Ref AvailabilityZones
+        SourceCIDR: !Ref SourceCIDR
+        VPCID: !GetAtt 
+          - VPCStack
+          - Outputs.VPCID
+        PublicSubnet1: !GetAtt 
+          - VPCStack
+          - Outputs.PublicSubnet1ID
+        PublicSubnet2: !GetAtt 
+          - VPCStack
+          - Outputs.PublicSubnet2ID
+        PrivateSubnet1: !GetAtt 
+          - VPCStack
+          - Outputs.PrivateSubnet1AID
+        PrivateSubnet2: !GetAtt 
+          - VPCStack
+          - Outputs.PrivateSubnet2AID
+        HVRInstanceTypeHUB: !Ref HVRInstanceTypeHUB
+        HVRInstanceTypeAgent: !Ref HVRInstanceTypeAgent
+        KeyName: !Ref KeyName
+        HvrUsername: !Ref HvrUsername
+        HvrPort: !Ref HvrPort
+        VolumeName: !Ref VolumeName
+
+  AuroraStack:
+    Condition: CreatePGStack
+    DependsOn: VPCStack
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL:
+        !Sub
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-aurora-postgresql/templates/aurora_postgres.template.yaml
+        - S3Bucket: !If
+            - UsingDefaultBucket
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
+            - !Ref 'QSS3BucketName'
+          S3Region: !If
+            - UsingDefaultBucket
+            - !Ref 'AWS::Region'
+            - !Ref 'QSS3BucketRegion'
+      Parameters:
+        Subnet1ID: !GetAtt 
+          - VPCStack
+          - Outputs.PrivateSubnet1AID
+        Subnet2ID: !GetAtt 
+          - VPCStack
+          - Outputs.PrivateSubnet2AID
+        VPCID: !GetAtt 
+          - VPCStack
+          - Outputs.VPCID
+        DBName: !Ref PGDBName
+        DBAutoMinorVersionUpgrade: 'true'
+        DBAllocatedStorageEncrypted: 'true'
+        DBBackupRetentionPeriod: '35'
+        DBEngineVersion: '9.6.12'
+        DBInstanceClass: !Ref PGInstanceClass
+        DBMasterUsername: !Ref PGMasterUsername
+        DBMasterUserPassword: !Ref PGMasterUserPassword
+        DBPort: !Ref PGDBPort
+        DBMultiAZ: 'true'
+        CustomDBSecurityGroup: ''
+        EnableEventSubscription: 'true'
+        DBAccessCIDR: !Ref SourceCIDR
+        NotificationList: !Ref NotificationList
+        EnvironmentStage: !Ref TagEnvironment
+
+Outputs:
+  PublicSubnet1CIDR:
+    Description: Public Subnet 1 CIDR Range
+    Value: !Ref PublicSubnet1CIDR
+  PublicSubnet2CIDR:
+    Description: Public Subnet 2 CIDR Range
+    Value: !Ref PublicSubnet2CIDR
+  PrivateSubnet1CIDR:
+    Description: Private Subnet 1 CIDR Range
+    Value: !Ref PrivateSubnet1CIDR
+  PrivateSubnet2CIDR:
+    Description: Private Subnet 2 CIDR Range
+    Value: !Ref PrivateSubnet2CIDR
+  VPCCIDR:
+    Description: VPC CIDR Range
+    Value: !Ref VPCCIDR
+  HvrPort:
+    Description: Port of the HVR Agent
+    Value: !Ref HvrPort
+  HvrUsername:
+    Description: User of the HVR Agent
+    Value: !Ref HvrUsername
+  DriversInstalled:
+    Description: List of Drivers
+    Value: MySQL/MariaDB, Postgres, Snowflake, Redshift
+  FileSystemID:
+    Description: File system ID
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.FileSystemID
+  MountTargetID1:
+    Description: Mount target ID 1
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.FileSystemID
+  MountTargetID2:
+    Description: Mount target ID 2
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.MountTargetID2
+  NLBHUBID:
+    Description: Network Load Balance ID HUB
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.NLBHUBID
+  NLBHUBTargetID:
+    Description: Network Load Balance Target Group ID HUB
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.NLBHUBTargetID
+  NLBAGENTID:
+    Description: Network Load Balance ID HUB
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.NLBAGENTID
+  NLBAGENTTargetID:
+    Description: Network Load Balance Target Group ID HUB
+    Value:
+      Fn::GetAtt:
+        - HVRStack
+        - Outputs.NLBAGENTTargetID
+  RDSEndpoint:
+    Description: Aurora Postgres Endpoint
+    Condition: CreatePGStack
+    Value:
+      Fn::GetAtt:
+        - AuroraStack
+        - Outputs.RDSEndPointAddress
+  RDSPort:
+    Description: Aurora Postgres port
+    Condition: CreatePGStack
+    Value:
+      Fn::GetAtt:
+        - AuroraStack
+        - Outputs.RDSEndPointPort
+  RDSDBName:
+    Description: RDS Database Name
+    Condition: CreatePGStack
+    Value: !Ref PGDBName

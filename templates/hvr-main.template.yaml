@@ -389,7 +389,7 @@ Resources:
     Properties:
       TemplateURL:
         !Sub
-        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.ah.template.yaml
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
             - !Sub 'quickstart-aws-hvr-${AWS::Region}'

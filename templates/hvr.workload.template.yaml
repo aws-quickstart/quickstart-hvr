@@ -8,6 +8,10 @@ AWSTemplateFormatVersion: 2010-09-09
 # Adds Network Load Balancer to support Multi-AZ environment for HA
 # 2020-09-24
 # Added ASG for EC2 Instance creation which will be behind NLB
+# 2020-11-30
+# Added ASG for EC2 Agent instances
+# Added NLB to support Multi-AZ environment for Agents
+# Fixed NFS Mount
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -29,7 +33,9 @@ Metadata:
         default: "HVR EC2 Configuration"
       Parameters:
       - AmazonLinuxAMI
-      - HVRInstanceType
+#      - HVRInstanceType
+      - HVRInstanceTypeHUB
+      - HVRInstanceTypeAgent
       - KeyName
       - HvrUsername
       - HvrPort
@@ -67,8 +73,12 @@ Metadata:
         default: Public subnet 2 ID
       SourceCIDR:
         default: Allowed external access CIDR
-      HVRInstanceType:
-        default: HVR EC2 instance type
+#      HVRInstanceType:
+#        default: HVR EC2 instance type
+      HVRInstanceTypeHUB:
+        default: HVR EC2 instance type for HVR HUB
+      HVRInstanceTypeAgent:
+        default: HVR EC2 instance type for HVR Agent
       KeyName:
         default: Key pair name
       HvrUsername:
@@ -123,11 +133,25 @@ Parameters:
     Description: "An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database)."
     Type: AWS::EC2::Subnet::Id
  
-  HVRInstanceType:
-    Description: Compute Based EC2 instance
+#  HVRInstanceType:
+#    Description: Compute Based EC2 instance
+#    Type: String
+#    Default: t2.large
+#    AllowedValues: [t2.medium, t2.large, t2.xlarge, t2.2xlarge, c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge, m4.xlarge, m4.2xlarge, m4.4xlarge]
+#    ConstraintDescription: Must be a valid EC2 instance type.
+
+  HVRInstanceTypeHUB:
+    Description: General Purpose EC2 instance - Recommended for HUB only Instances
     Type: String
-    Default: t2.large
-    AllowedValues: [t2.medium, t2.large, t2.xlarge, t2.2xlarge, c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge, m4.xlarge, m4.2xlarge, m4.4xlarge]
+    Default: m4.xlarge
+    AllowedValues: [m4.xlarge, m4.2xlarge, m4.4xlarge, t2.medium, t2.large, t2.xlarge, t2.2xlarge]
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  HVRInstanceTypeAgent:
+    Description: Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate
+    Type: String
+    Default: c4.xlarge
+    AllowedValues: [c4.large, c4.xlarge, c4.2xlarge, c4.4xlarge]
     ConstraintDescription: Must be a valid EC2 instance type.
 
   KeyName:
@@ -154,7 +178,6 @@ Parameters:
     MinLength: '1'
     Default: HVREFS
   
-
   TagName:
     Type: String
     Description: 'The unique friendly name as required by your company’s tagging strategy document, which will be added to the tag.'
@@ -238,16 +261,16 @@ Mappings:
       AMI: ami-0ea3184595e827989
 
 Resources:
-  # Security Group for the HVR_TMP.  Allow SSH, HVR Port, EFS and Web from Specific CIDR:
-  HVRSecurityGroup:
+  # Security Group for the HVR HUB.  Allow SSH, HVR Port and Web from Specific CIDR, EFS Port open for Mount
+  HVRSecurityGroupHUB:
     Condition: IsAcceptedEULA
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security Group for the HVR Agent
+      GroupDescription: Security Group for the HVR Hub
       VpcId: !Ref VPCID
       Tags:
       - Key: Name
-        Value: HVRSecurityGroup
+        Value: HVRSecurityGroupHUB
       SecurityGroupIngress:
       - IpProtocol: tcp
         FromPort: !Ref HvrPort
@@ -267,8 +290,28 @@ Resources:
       - IpProtocol: tcp
         FromPort: 2049
         ToPort: 2049
-        CidrIp:
-          Ref: SourceCIDR
+        CidrIp: 0.0.0.0/0
+
+# Security Group for the HVR Agent.  Allow SSH and HVR Port 
+  HVRSecurityGroupAgent:
+    Condition: IsAcceptedEULA
+    DependsOn: HVRSecurityGroupHUB
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for the HVR Hub
+      VpcId: !Ref VPCID
+      Tags:
+      - Key: Name
+        Value: HVRSecurityGroupAgent
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
 
   # EFS File System
   FileSystem:
@@ -283,7 +326,9 @@ Resources:
     
   MountTarget1:
     Condition: IsAcceptedEULA
-    DependsOn: FileSystem
+    DependsOn: 
+     - FileSystem
+     - HVRSecurityGroupHUB
     Type: AWS::EFS::MountTarget
     Properties:
       FileSystemId:
@@ -291,11 +336,13 @@ Resources:
       SubnetId:
         Ref: PublicSubnet1
       SecurityGroups:
-      - Ref: HVRSecurityGroup
+      - Ref: HVRSecurityGroupHUB
     
   MountTarget2:
     Condition: IsAcceptedEULA
-    DependsOn: FileSystem
+    DependsOn: 
+     - FileSystem
+     - HVRSecurityGroupHUB
     Type: AWS::EFS::MountTarget
     Properties:
       FileSystemId:
@@ -303,17 +350,16 @@ Resources:
       SubnetId:
         Ref: PublicSubnet2
       SecurityGroups:
-      - Ref: HVRSecurityGroup
+      - Ref: HVRSecurityGroupHUB
   
   # Launch HVR Hub in a Auto Scaling Group - Only 1 EC2 instance is running at a time.
-  HVRAutoScalingGroup:
+  HVRHUBAutoScalingGroup:
     Type: 'AWS::AutoScaling::AutoScalingGroup'
     Properties:
-      AutoScalingGroupName: 'HVRASG'
-#      LaunchConfigurationName: !Ref HVRLaunchConfiguration
+      AutoScalingGroupName: 'HVRHUBASG'
       LaunchTemplate:
-        LaunchTemplateId: !Ref HVRLaunchTemplate
-        Version: !GetAtt HVRLaunchTemplate.LatestVersionNumber
+        LaunchTemplateId: !Ref HVRHUBLaunchTemplate
+        Version: !GetAtt HVRHUBLaunchTemplate.LatestVersionNumber
       VPCZoneIdentifier:
         - !Ref PublicSubnet1
         - !Ref PublicSubnet2
@@ -326,7 +372,7 @@ Resources:
           Value: 'HVRHUB'
           PropagateAtLaunch: true
       TargetGroupARNs:
-      - !Ref HVRHubNLBTargetGroup
+      - !Ref HVRHUBNLBTargetGroup
     CreationPolicy:
       ResourceSignal:
         Count: 1
@@ -336,13 +382,44 @@ Resources:
     UpdatePolicy:
       AutoScalingReplacingUpdate:
         WillReplace: true
-  
-  HVRLaunchTemplate:
+
+  # Launch HVR Agents in a Auto Scaling Group - 1 EC2 instances in each AZ
+  HVRAgentAutoScalingGroup:
+    Type: 'AWS::AutoScaling::AutoScalingGroup'
+    Properties:
+      AutoScalingGroupName: 'HVRAGENTASG'
+      LaunchTemplate:
+        LaunchTemplateId: !Ref HVRAgentLaunchTemplate
+        Version: !GetAtt HVRAgentLaunchTemplate.LatestVersionNumber
+      VPCZoneIdentifier:
+        - !Ref PrivateSubnet1
+        - !Ref PrivateSubnet2
+      MinSize: '2'
+      MaxSize: '4'
+      Cooldown: '900'
+      DesiredCapacity: '2'
+      Tags:
+        - Key: Name
+          Value: 'HVRAGENT'
+          PropagateAtLaunch: true
+      TargetGroupARNs:
+      - !Ref HVRAgentNLBTargetGroup
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M
+      AutoScalingCreationPolicy:
+        MinSuccessfulInstancesPercent: 100
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
+
+  HVRHUBLaunchTemplate:
     Condition: IsAcceptedEULA
     DependsOn: FileSystem 
     Type: AWS::EC2::LaunchTemplate
     Properties:
-      LaunchTemplateName: 'HVRLaunchTemplate'
+      LaunchTemplateName: 'HVRHUBLaunchTemplate'
       LaunchTemplateData:
         KeyName: !Ref KeyName
         IamInstanceProfile: 
@@ -356,8 +433,8 @@ Resources:
           - Ref: AWS::Region
           - AMI
         SecurityGroupIds:
-          - !Ref HVRSecurityGroup
-        InstanceType: !Ref HVRInstanceType
+          - !Ref HVRSecurityGroupHUB
+        InstanceType: !Ref HVRInstanceTypeHUB
         UserData:      #  This code HVR as a systemd service.  unixODBC, mysql, postgres, snowflake, redshift, Then it signals completion:
           Fn::Base64:
             !Sub |
@@ -368,8 +445,10 @@ Resources:
               export HVR_CONFIG=/opt/hvr/hvr_config
               # Create EFS Mount Point
               sudo yum install -y amazon-efs-utils
+              # AWS recommends that you wait 90 seconds after creating a mount target before you mount your file system. This wait lets the DNS records propagate fully in the AWS Region where the file system is.
+              # sleep 90
               # Mount EFS FileSystem to use $HVR_CONFIG as the mount point
-              mount -t efs ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ $HVR_CONFIG
+              mount -t efs ${FileSystem}:/ $HVR_CONFIG
               chown -R ec2-user:ec2-user $HVR_CONFIG
               systemctl enable mariadb
               systemctl restart mariadb
@@ -387,76 +466,68 @@ Resources:
 
               function cfn_fail
               {
-                /opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRAutoScalingGroup
+                /opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRHUBAutoScalingGroup
                 exit 1
               }
 
               function cfn_success
               {
-                /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRAutoScalingGroup
+                /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRHUBAutoScalingGroup
                 exit 0
               }       
 
               # just run cfn-signal 
               cfn_success || cfn_fail
 
-  HVRLaunchConfiguration:
+  HVRAgentLaunchTemplate:
     Condition: IsAcceptedEULA
-    DependsOn: FileSystem
-    Type: AWS::AutoScaling::LaunchConfiguration
+    DependsOn: FileSystem 
+    Type: AWS::EC2::LaunchTemplate
     Properties:
-      AssociatePublicIpAddress: true
-      KeyName: !Ref KeyName
-      IamInstanceProfile: !Ref HVRInstanceProfile
-      ImageId:
-        Fn::FindInMap:
-        - RegionMap
-        - Ref: AWS::Region
-        - AMI
-      SecurityGroups:
-        - !Ref HVRSecurityGroup
-      InstanceType: !Ref HVRInstanceType
-      UserData:      #  This code HVR as a systemd service.  unixODBC, mysql, postgres, snowflake, redshift, Then it signals completion:
-        Fn::Base64:
-          !Sub |
-            #!/bin/bash -x
-            yum update -y
-            yum install -y unixODBC mariadb-server
-            export HVR_HOME=/opt/hvr/hvr_home
-            export HVR_CONFIG=/opt/hvr/hvr_config
-            # Create EFS Mount Point
-            sudo yum install -y amazon-efs-utils
-            # Mount EFS FileSystem to use $HVR_CONFIG as the mount point
-            mount -t efs ${FileSystem}.efs.${AWS::Region}.amazonaws.com:/ $HVR_CONFIG
-            chown -R ec2-user:ec2-user $HVR_CONFIG
-            systemctl enable mariadb
-            systemctl restart mariadb
-            mysql -u root -e "create database hvrsource";
-            runuser -l ec2-user -c "hvrcatalogcreate '-uec2-user/' -h postgresql '~~hvrhub'"
-            # HammerDB - GPL Licensed
-            wget https://github.com/TPC-Council/HammerDB/releases/download/v3.3/HammerDB-3.3-Linux-x86-64-Install
-            chmod +x HammerDB-3.3-Linux-x86-64-Install
-            ./HammerDB-3.3-Linux-x86-64-Install --mode silent --prefix /opt/hammerdb
-            rm HammerDB-3.3-Linux-x86-64-Install
-            # fix library links for HDB
-            ln -s /usr/lib/oracle/12.1/client64/lib/libclntsh.so.12.1 /usr/lib/oracle/12.1/client64/lib/libclntsh.so
-            /opt/hammerdb
+      LaunchTemplateName: 'HVRAgentLaunchTemplate'
+      LaunchTemplateData:
+        KeyName: !Ref KeyName
+        IamInstanceProfile: 
+          Arn:
+            Fn::GetAtt:
+            - HVRInstanceProfile
+            - Arn
+        ImageId:
+          Fn::FindInMap:
+          - RegionMap
+          - Ref: AWS::Region
+          - AMI
+        SecurityGroupIds:
+          - !Ref HVRSecurityGroupAgent
+        InstanceType: !Ref HVRInstanceTypeAgent
+        UserData:      #  This code HVR as a systemd service.  unixODBC, mysql, postgres, snowflake, redshift, Then it signals completion:
+          Fn::Base64:
+            !Sub |
+              #!/bin/bash -x
+              yum update -y
+              yum install -y unixODBC mariadb-server
+              export HVR_HOME=/opt/hvr/hvr_home
+              export HVR_CONFIG=/opt/hvr/hvr_config
+
+              # fix library links for HDB
+              ln -s /usr/lib/oracle/12.1/client64/lib/libclntsh.so.12.1 /usr/lib/oracle/12.1/client64/lib/libclntsh.so
 
               function cfn_fail
               {
-                /opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRAutoScalingGroup
-               exit 1
+                /opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRAgentAutoScalingGroup
+                exit 1
               }
 
               function cfn_success
               {
-                /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRAutoScalingGroup
+                /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource HVRAgentAutoScalingGroup
                 exit 0
-              }              
-              /opt/aws/bin/cfn-init -v --stack '${AWS::StackName}' --resource HVRLaunchConfiguration --region ${AWS::Region} || cfn_fail
-              [ $(qs_status) == 0 ] && cfn_success || cfn_fail
+              }       
 
-  HVRHubNLB:
+              # just run cfn-signal 
+              cfn_success || cfn_fail
+  
+  HVRHUBNLB:
     Condition: IsAcceptedEULA
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
@@ -469,10 +540,24 @@ Resources:
       Tags:
         - Key: Name
           Value: hvrhub-nlb
-    
-  HVRHubNLBTargetGroup:
+
+  HVRAgentNLB:
     Condition: IsAcceptedEULA
-    DependsOn: HVRHubNLB
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: hvragent-nlb
+      Scheme: internal
+      Subnets: 
+        - Ref: PrivateSubnet1
+        - Ref: PrivateSubnet2
+      Type: network
+      Tags:
+        - Key: Name
+          Value: hvragent-nlb
+
+  HVRHUBNLBTargetGroup:
+    Condition: IsAcceptedEULA
+    DependsOn: HVRHUBNLB
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Name: hvrhub-nlb-target
@@ -486,16 +571,45 @@ Resources:
       Tags:
         - Key: Name
           Value: hvrhub-nlb-target
-    
-  HVRHubNLBListener:
+
+  HVRAgentNLBTargetGroup:
     Condition: IsAcceptedEULA
-    DependsOn: HVRHubNLB
+    DependsOn: HVRAgentNLB
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: hvragent-nlb-target
+      TargetType: instance
+      Port: !Ref HvrPort
+      Protocol: TCP
+      VpcId: !Ref VPCID
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: 60
+      Tags:
+        - Key: Name
+          Value: hvragent-nlb-target
+
+  HVRHUBNLBListener:
+    Condition: IsAcceptedEULA
+    DependsOn: HVRHUBNLB
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
       DefaultActions:
       - Type: forward
-        TargetGroupArn: !Ref HVRHubNLBTargetGroup
-      LoadBalancerArn: !Ref HVRHubNLB
+        TargetGroupArn: !Ref HVRHUBNLBTargetGroup
+      LoadBalancerArn: !Ref HVRHUBNLB
+      Port: !Ref HvrPort
+      Protocol: TCP
+
+  HVRAgentNLBListener:
+    Condition: IsAcceptedEULA
+    DependsOn: HVRAgentNLB
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+      - Type: forward
+        TargetGroupArn: !Ref HVRAgentNLBTargetGroup
+      LoadBalancerArn: !Ref HVRAgentNLB
       Port: !Ref HvrPort
       Protocol: TCP
 
@@ -515,12 +629,6 @@ Resources:
         - PolicyDocument:
             Version: 2012-10-17
             Statement:
-            - Action:
-              - redshift:DescribeClusters
-              Effect: Allow
-              Resource:
-              - "*"
-              Sid: StmtMinRedshift
             - Action:
               - s3:ListAllMyBuckets
               - s3:ListBucket
@@ -618,11 +726,16 @@ Resources:
         - !Ref HVRRole
 
 Outputs:
-  HVRAutoScalingGroup:
+  HVRHUBAutoScalingGroup:
     Description: Auto Scaling Group Reference ID
-    Value: !Ref HVRAutoScalingGroup
+    Value: !Ref HVRHUBAutoScalingGroup
     Export:
-      Name: !Sub '${AWS::StackName}-HVRAutoScalingGroup'
+      Name: !Sub '${AWS::StackName}-HVRHUBAutoScalingGroup'
+  HVRAgentAutoScalingGroup:
+    Description: Auto Scaling Group Reference ID
+    Value: !Ref HVRAgentAutoScalingGroup
+    Export:
+      Name: !Sub '${AWS::StackName}-HVRAgentAutoScalingGroup'
   HvrPort:
     Description: Port of the HVR Agent
     Value: !Ref HvrPort
@@ -641,9 +754,15 @@ Outputs:
   MountTargetID2:
     Description: Mount target ID 2
     Value: !Ref MountTarget2
-  NLBID:
-    Description: Network Load Balance ID
-    Value: !Ref HVRHubNLB
-  NLBTargetID:
-    Description: Network Load Balance Target Group ID
-    Value: !Ref HVRHubNLBTargetGroup
+  NLBHUBID:
+    Description: Network Load Balance ID HUB
+    Value: !Ref HVRHUBNLB
+  NLBHUBTargetID:
+    Description: Network Load Balance Target Group ID HUB
+    Value: !Ref HVRHUBNLBTargetGroup
+  NLBAGENTID:
+    Description: Network Load Balance ID AGENT
+    Value: !Ref HVRAgentNLB
+  NLBAGENTTargetID:
+    Description: Network Load Balance Target Group ID AGENT
+    Value: !Ref HVRAgentNLBTargetGroup

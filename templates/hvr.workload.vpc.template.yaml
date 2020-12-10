@@ -12,6 +12,8 @@ AWSTemplateFormatVersion: 2010-09-09
 # Added ASG for EC2 Agent instances
 # Added NLB to support Multi-AZ environment for Agents
 # Fixed NFS Mount
+# 2020-12-09
+# Modify Security Group to use VPC CIDR from VPC Stack
 
 Metadata:
   AWS::CloudFormation::Interface:

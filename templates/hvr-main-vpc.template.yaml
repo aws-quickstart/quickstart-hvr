@@ -149,6 +149,22 @@ Parameters:
       your selections is preserved.
    Type: 'List<AWS::EC2::AvailabilityZone::Name>'
 
+  #PublicSubnet1:
+  #  Type: AWS::EC2::Subnet::Id
+  #  Description: Select the first public subnet in your selected VPC.  HVR will initially run here.
+  
+  #PublicSubnet2:
+  #  Type: AWS::EC2::Subnet::Id
+  #  Description: Select the second public subnet in a second availibility zone in your selected VPC.  HVR will run here in the event of a failure in the first AZ.
+
+  #PrivateSubnet1:
+  #  Description: "An existing private subnet 1 to launch secondary resources (e.g. PostgresSQL database)."
+  #  Type: AWS::EC2::Subnet::Id
+
+  #PrivateSubnet2:
+  #  Description: "An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database)."
+  #  Type: AWS::EC2::Subnet::Id   
+
   SourceCIDR:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
     ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
@@ -403,7 +419,6 @@ Resources:
         AvailabilityZones: !Join 
           - ','
           - !Ref AvailabilityZones
-        KeyPairName: !Ref KeyName
         NumberOfAZs: '2'
         PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
         PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
@@ -434,16 +449,28 @@ Resources:
         VPCID: !GetAtt 
           - VPCStack
           - Outputs.VPCID
-        PublicSubnet1: !GetAtt 
+        PrivateSubnet1CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PrivateSubnet1ACIDR
+        PrivateSubnet2CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PrivateSubnet2ACIDR
+        PublicSubnet1CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PublicSubnet1CIDR
+        PublicSubnet2CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PublicSubnet2CIDR
+        PublicSubnet1: !GetAtt
           - VPCStack
           - Outputs.PublicSubnet1ID
-        PublicSubnet2: !GetAtt 
+        PublicSubnet2: !GetAtt
           - VPCStack
           - Outputs.PublicSubnet2ID
-        PrivateSubnet1: !GetAtt 
+        PrivateSubnet1: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet1AID
-        PrivateSubnet2: !GetAtt 
+        PrivateSubnet2: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet2AID
         HVRInstanceTypeHUB: !Ref HVRInstanceTypeHUB
@@ -498,19 +525,39 @@ Resources:
 Outputs:
   PublicSubnet1CIDR:
     Description: Public Subnet 1 CIDR Range
-    Value: !Ref PublicSubnet1CIDR
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PublicSubnet1CIDR
+    #Value: !Ref PublicSubnet1CIDR
   PublicSubnet2CIDR:
     Description: Public Subnet 2 CIDR Range
-    Value: !Ref PublicSubnet2CIDR
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PublicSubnet2CIDR
+    #Value: !Ref PublicSubnet2CIDR
   PrivateSubnet1CIDR:
     Description: Private Subnet 1 CIDR Range
-    Value: !Ref PrivateSubnet1CIDR
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PrivateSubnet1ACIDR
+    #Value: !Ref PrivateSubnet1CIDR
   PrivateSubnet2CIDR:
     Description: Private Subnet 2 CIDR Range
-    Value: !Ref PrivateSubnet2CIDR
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PrivateSubnet2ACIDR
+    #Value: !Ref PrivateSubnet2CIDR
   VPCCIDR:
     Description: VPC CIDR Range
-    Value: !Ref VPCCIDR
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.VPCCIDR
+    #Value: !Ref VPCCIDR
   HvrPort:
     Description: Port of the HVR Agent
     Value: !Ref HvrPort

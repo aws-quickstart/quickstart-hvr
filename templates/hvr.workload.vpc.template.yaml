@@ -307,11 +307,7 @@ Resources:
       - Key: Name
         Value: HVRSecurityGroupHUB
       SecurityGroupIngress:
-      - IpProtocol: tcp
-        FromPort: !Ref HvrPort
-        ToPort: !Ref HvrPort
-        CidrIp:
-          Ref: SourceCIDR
+      # Agent Communication
       - IpProtocol: tcp
         FromPort: !Ref HvrPort
         ToPort: !Ref HvrPort
@@ -322,6 +318,17 @@ Resources:
         ToPort: !Ref HvrPort
         CidrIp:
           Ref: PrivateSubnet2CIDR
+      # NLB
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PublicSubnet1CIDR
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PublicSubnet2CIDR
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
@@ -332,6 +339,7 @@ Resources:
         ToPort: 8080
         CidrIp:
           Ref: SourceCIDR
+      # EFS
       - IpProtocol: tcp
         FromPort: 2049
         ToPort: 2049
@@ -355,6 +363,7 @@ Resources:
       - Key: Name
         Value: HVRSecurityGroupAgent
       SecurityGroupIngress:
+      # Hub Communication
       - IpProtocol: tcp
         FromPort: !Ref HvrPort
         ToPort: !Ref HvrPort
@@ -365,6 +374,17 @@ Resources:
         ToPort: !Ref HvrPort
         CidrIp:
           Ref: PublicSubnet2CIDR
+      # NLB
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PrivateSubnet1CIDR
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PrivateSubnet2CIDR
 
   # EFS File System
   FileSystem:

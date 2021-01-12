@@ -12,6 +12,8 @@ AWSTemplateFormatVersion: 2010-09-09
 # Added ASG for EC2 Agent instances
 # Added NLB to support Multi-AZ environment for Agents
 # Fixed NFS Mount
+# 2020-12-09
+# Modify Security Group to use VPC CIDR from VPC Stack
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -29,6 +31,10 @@ Metadata:
       - PrivateSubnet1
       - PrivateSubnet2
       - SourceCIDR
+      - PublicSubnet1CIDR
+      - PublicSubnet2CIDR
+      - PrivateSubnet1CIDR
+      - PrivateSubnet2CIDR
     - Label:
         default: "HVR EC2 Configuration"
       Parameters:
@@ -73,6 +79,14 @@ Metadata:
         default: Public subnet 2 ID
       SourceCIDR:
         default: Allowed external access CIDR
+      PublicSubnet1CIDR:
+        default: Public Subnet 1 (AZ1) CIDR Range
+      PublicSubnet2CIDR:
+        default: Public Subnet 2 (AZ2) CIDR Range
+      PrivateSubnet1CIDR:
+        default: Private Subnet 1 (AZ1) CIDR Range
+      PrivateSubnet2CIDR:
+        default: Private Subnet 2 (AZ2) CIDR Range
 #      HVRInstanceType:
 #        default: HVR EC2 instance type
       HVRInstanceTypeHUB:
@@ -132,6 +146,26 @@ Parameters:
   PrivateSubnet2:
     Description: "An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database)."
     Type: AWS::EC2::Subnet::Id
+
+  PublicSubnet1CIDR:
+    Description: VPC Stack Shared CIDR block for the public subnet 1 located in Availability Zone 1
+    Type: String
+    NoEcho: true
+  
+  PublicSubnet2CIDR:
+    Description: VPC Stack Shared CIDR block for the public subnet 2 located in Availability Zone 2
+    Type: String
+    NoEcho: true
+
+  PrivateSubnet1CIDR:
+    Description: VPC Stack Shared CIDR block for the private subnet 1 located in Availability Zone 1
+    Type: String
+    NoEcho: true
+  
+  PrivateSubnet2CIDR:
+    Description: VPC Stack Shared CIDR block for the private subnet 2 located in Availability Zone 2
+    Type: String
+    NoEcho: true
  
 #  HVRInstanceType:
 #    Description: Compute Based EC2 instance
@@ -267,16 +301,34 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Security Group for the HVR Hub
-      VpcId: !Ref VPCID
+      VpcId: 
+        Ref: VPCID
       Tags:
       - Key: Name
         Value: HVRSecurityGroupHUB
       SecurityGroupIngress:
+      # Agent Communication
       - IpProtocol: tcp
         FromPort: !Ref HvrPort
         ToPort: !Ref HvrPort
         CidrIp:
-          Ref: SourceCIDR
+          Ref: PrivateSubnet1CIDR
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PrivateSubnet2CIDR
+      # NLB
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PublicSubnet1CIDR
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PublicSubnet2CIDR
       - IpProtocol: tcp
         FromPort: 22
         ToPort: 22
@@ -287,10 +339,17 @@ Resources:
         ToPort: 8080
         CidrIp:
           Ref: SourceCIDR
+      # EFS
       - IpProtocol: tcp
         FromPort: 2049
         ToPort: 2049
-        CidrIp: 0.0.0.0/0
+        CidrIp:
+          Ref: PublicSubnet1CIDR
+      - IpProtocol: tcp
+        FromPort: 2049
+        ToPort: 2049
+        CidrIp:
+          Ref: PublicSubnet2CIDR
 
 # Security Group for the HVR Agent.  Allow SSH and HVR Port 
   HVRSecurityGroupAgent:
@@ -304,14 +363,28 @@ Resources:
       - Key: Name
         Value: HVRSecurityGroupAgent
       SecurityGroupIngress:
+      # Hub Communication
       - IpProtocol: tcp
         FromPort: !Ref HvrPort
         ToPort: !Ref HvrPort
-        CidrIp: 0.0.0.0/0
+        CidrIp:
+          Ref: PublicSubnet1CIDR
       - IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PublicSubnet2CIDR
+      # NLB
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PrivateSubnet1CIDR
+      - IpProtocol: tcp
+        FromPort: !Ref HvrPort
+        ToPort: !Ref HvrPort
+        CidrIp:
+          Ref: PrivateSubnet2CIDR
 
   # EFS File System
   FileSystem:

@@ -132,7 +132,7 @@ Metadata:
       QSS3KeyPrefix:
         default: Quick Start S3 Key Prefix
 
-  License: Apache-2.0      
+  License: Apache-2.0
 
 Parameters:
   AcceptedEULA:
@@ -382,17 +382,17 @@ Mappings:
       AMI: ami-0ea3184595e827989
 
 Resources:
-## Nested Resources - HVR, Aurora PostgreSQL and Redshift
+## Nested Resources - HVR and Aurora PostgreSQL
   HVRStack:
     Condition: IsAcceptedEULA
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL:
         !Sub
-        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.ah.template.yaml
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
             - !Ref 'QSS3BucketName'
           S3Region: !If
             - UsingDefaultBucket
@@ -424,7 +424,7 @@ Resources:
         - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-aurora-postgresql/templates/aurora_postgres.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
             - !Ref 'QSS3BucketName'
           S3Region: !If
             - UsingDefaultBucket

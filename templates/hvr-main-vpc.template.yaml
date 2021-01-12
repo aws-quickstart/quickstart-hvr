@@ -127,7 +127,7 @@ Metadata:
       QSS3BucketName:
         default: Quick Start S3 bucket name
       QSS3KeyPrefix:
-        default: Quick Start S3 key prefix
+        default: Quick Start S3 Key prefix
 
   License: Apache-2.0
 
@@ -148,6 +148,22 @@ Parameters:
       Availability Zones are used for this deployment, and the logical order of
       your selections is preserved.
    Type: 'List<AWS::EC2::AvailabilityZone::Name>'
+
+  #PublicSubnet1:
+  #  Type: AWS::EC2::Subnet::Id
+  #  Description: Select the first public subnet in your selected VPC.  HVR will initially run here.
+  
+  #PublicSubnet2:
+  #  Type: AWS::EC2::Subnet::Id
+  #  Description: Select the second public subnet in a second availibility zone in your selected VPC.  HVR will run here in the event of a failure in the first AZ.
+
+  #PrivateSubnet1:
+  #  Description: "An existing private subnet 1 to launch secondary resources (e.g. PostgresSQL database)."
+  #  Type: AWS::EC2::Subnet::Id
+
+  #PrivateSubnet2:
+  #  Description: "An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database)."
+  #  Type: AWS::EC2::Subnet::Id   
 
   SourceCIDR:
     AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
@@ -310,13 +326,13 @@ Parameters:
   QSS3BucketName:
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
     ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Default: 'quickstart-hvr'
+    Default: 'quickstart-aws-hvr'
     Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     Type: String
   QSS3KeyPrefix:
     AllowedPattern: "^[0-9a-zA-Z-/]*$"
     ConstraintDescription: "Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
-    Default: templates/
+    Default: quickstart-hvr/
     Description: "The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
     Type: String
 
@@ -324,7 +340,7 @@ Conditions:
   IsGovCloud: !Equals
     - !Ref 'AWS::Region'
     - us-gov-west-1
-  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'quickstart-hvr']
+  UsingDefaultBucket: !Equals [!Ref QSS3BucketName, 'quickstart-aws-hvr']
   CreatePGStack: !Equals
     - !Ref EnablePGStack
     - "true"
@@ -384,16 +400,16 @@ Mappings:
       AMI: ami-0ea3184595e827989
 
 Resources:
-## Nested Resources - VPC, HVR, Aurora PostgreSQL and Redshift
+## Nested Resources - VPC, HVR and Aurora PostgreSQL
   VPCStack:
     Type: 'AWS::CloudFormation::Stack'
     Properties:
       TemplateURL:
         !Sub
-        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}/submodules/quickstart-aws-vpc/aws-vpc.template.yaml
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
             - !Ref 'QSS3BucketName'
           S3Region: !If
             - UsingDefaultBucket
@@ -403,7 +419,6 @@ Resources:
         AvailabilityZones: !Join 
           - ','
           - !Ref AvailabilityZones
-        KeyPairName: !Ref KeyName
         NumberOfAZs: '2'
         PrivateSubnet1ACIDR: !Ref PrivateSubnet1CIDR
         PrivateSubnet2ACIDR: !Ref PrivateSubnet2CIDR
@@ -418,32 +433,44 @@ Resources:
     Properties:
       TemplateURL:
         !Sub
-        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}hvr.workload.ah.template.yaml
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.vpc.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
             - !Ref 'QSS3BucketName'
           S3Region: !If
             - UsingDefaultBucket
             - !Ref 'AWS::Region'
             - !Ref 'QSS3BucketRegion'
-      Parameters:    
+      Parameters:
         AcceptedEULA: !Ref AcceptedEULA
         #AvailabilityZones: !Ref AvailabilityZones
         SourceCIDR: !Ref SourceCIDR
         VPCID: !GetAtt 
           - VPCStack
           - Outputs.VPCID
-        PublicSubnet1: !GetAtt 
+        PrivateSubnet1CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PrivateSubnet1ACIDR
+        PrivateSubnet2CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PrivateSubnet2ACIDR
+        PublicSubnet1CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PublicSubnet1CIDR
+        PublicSubnet2CIDR: !GetAtt
+          - VPCStack
+          - Outputs.PublicSubnet2CIDR
+        PublicSubnet1: !GetAtt
           - VPCStack
           - Outputs.PublicSubnet1ID
-        PublicSubnet2: !GetAtt 
+        PublicSubnet2: !GetAtt
           - VPCStack
           - Outputs.PublicSubnet2ID
-        PrivateSubnet1: !GetAtt 
+        PrivateSubnet1: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet1AID
-        PrivateSubnet2: !GetAtt 
+        PrivateSubnet2: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet2AID
         HVRInstanceTypeHUB: !Ref HVRInstanceTypeHUB
@@ -460,10 +487,10 @@ Resources:
     Properties:
       TemplateURL:
         !Sub
-        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}/submodules/quickstart-amazon-aurora-postgresql/templatesaurora_postgres.template.yaml
+        - https://${QSS3BucketName}.s3.${QSS3BucketRegion}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-aurora-postgresql/templates/aurora_postgres.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub 'quickstart-hvr-${AWS::Region}'
+            - !Sub 'quickstart-aws-hvr-${AWS::Region}'
             - !Ref 'QSS3BucketName'
           S3Region: !If
             - UsingDefaultBucket
@@ -496,6 +523,41 @@ Resources:
         EnvironmentStage: !Ref TagEnvironment
 
 Outputs:
+  PublicSubnet1CIDR:
+    Description: Public Subnet 1 CIDR Range
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PublicSubnet1CIDR
+    #Value: !Ref PublicSubnet1CIDR
+  PublicSubnet2CIDR:
+    Description: Public Subnet 2 CIDR Range
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PublicSubnet2CIDR
+    #Value: !Ref PublicSubnet2CIDR
+  PrivateSubnet1CIDR:
+    Description: Private Subnet 1 CIDR Range
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PrivateSubnet1ACIDR
+    #Value: !Ref PrivateSubnet1CIDR
+  PrivateSubnet2CIDR:
+    Description: Private Subnet 2 CIDR Range
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.PrivateSubnet2ACIDR
+    #Value: !Ref PrivateSubnet2CIDR
+  VPCCIDR:
+    Description: VPC CIDR Range
+    Value:
+      Fn::GetAtt:
+        - VPCStack
+        - Outputs.VPCCIDR
+    #Value: !Ref VPCCIDR
   HvrPort:
     Description: Port of the HVR Agent
     Value: !Ref HvrPort

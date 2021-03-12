@@ -1,0 +1,388 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+
+######################################
+## Stack Description  
+######################################
+Description: >-
+  This template creates an HVR Bastion host environment in a specified VPC public subnet. 
+  The Bastion Host is based on the HVR 5.7 BYOL Marketplace Image.  This will
+  allow you to open the HVR GUI from the Bastion Host - connecting to the HVR HUB 
+  in the private subnet.
+  
+  **WARNING**
+  This template creates EC2 instance a Network Load Balancer and related resources. 
+  You will be billed for the AWS resources used if you create a stack from this template.
+
+######################################
+## Stack Metadata
+######################################
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: End User License Agreement (EULA) - HVR CDC
+        Parameters:
+          - AcceptedEULA
+      - Label:
+          default: "VPC network configuration"
+        Parameters:
+          - VPCID
+          - PublicSubnet1
+          - PublicSubnet2
+          - RemoteAccessCIDR
+      - Label:
+          default: "HVR EC2 Configuration"
+        Parameters:
+          - HVRInstanceTypeBastion
+          - KeyName
+      - Label:
+          default: Tag identifiers
+        Parameters:
+          - TagEnvironment
+
+    ParameterLabels:
+      AcceptedEULA:
+        default: Accepted EULA from AWS Marketplace
+      VPCID:
+        default: VPCID ID
+      PublicSubnet1:
+        default: Public subnet 1 ID
+      PublicSubnet2:
+        default: Public subnet 2 ID
+      HVRInstanceTypeBastion:
+        default: HVR EC2 instance type for HVR Bastion Host
+      RemoteAccessCIDR:
+        default: Allowed CIDR to Bastion Host
+      KeyName:
+        default: Key pair name
+      TagEnvironment:
+        default: Environment Tag 
+
+  License: Apache-2.0
+
+
+######################################
+## Parameters
+######################################
+Parameters:
+  AcceptedEULA:
+    AllowedValues:
+      - "yes"
+      - "no"
+    Default: "yes"
+    Description: >-
+      PLEASE READ THE HVR SOFTWARE LICENSE AGREEMENT (https://www.hvr-software.com/license-agreement/) CAREFULLY BEFORE USING THE SOFTWARE.
+      The HVR stack can be created only if you have already accepted the EULA. To accept the EULA, see https://aws.amazon.com/marketplace/pp/B077YM8HPW.
+    Type: String
+
+  VPCID:
+    Type: AWS::EC2::VPC::Id
+    Description: The ID of the existing VPC that contains the subnets.
+
+  PublicSubnet1:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select the first public subnet in your selected VPC.  HVR will initially run here.
+
+  PublicSubnet2:
+    Type: AWS::EC2::Subnet::Id
+    Description: Select the second public subnet in a second availibility zone in your selected VPC.  HVR will run here in the event of a failure in the first AZ.
+
+  HVRInstanceTypeBastion:
+    Description: General Purpose EC2 instance 
+    Type: String
+    Default: t3.small
+    AllowedValues:
+      [
+        t3.small,
+        t3.medium,
+        t3.large
+      ]
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  TagEnvironment:
+    Type: String
+    AllowedValues:
+      - dev
+      - test
+      - qa
+      - prod
+    Description: Designates the environment stage of the associated AWS resource.
+    Default: "dev"
+
+  RemoteAccessCIDR:
+    AllowedPattern: "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/x
+    Description: The CIDR address from which you will connect to the Bastion Host.
+    Type: String
+
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: must be the name of an existing EC2 KeyPair.
+
+
+######################################
+## Condition definitions 
+######################################
+Conditions:
+  IsAcceptedEULA: !Equals
+    - !Ref AcceptedEULA
+    - "yes"
+
+
+######################################
+## Mapping definitions 
+######################################
+Mappings:
+  RegionMap:
+    eu-north-1:
+        AMI: ami-0f07016ab7c03d800
+    ap-south-1:
+        AMI: ami-085b30b437e823da7
+    eu-west-3:
+        AMI: ami-062b667b368b18a2f
+    eu-west-2:
+        AMI: ami-0004fb5249214d11c
+    eu-west-1:
+        AMI: ami-0c03e7108b82481b5
+    ap-northeast-2:
+        AMI: ami-02741b7d524051f33
+    ap-northeast-1:
+        AMI: ami-06dda44c8494968ce
+    sa-east-1:
+        AMI: ami-003e4a6a1f53c42af
+    ca-central-1:
+        AMI: ami-0d10d597241549c03
+    ap-southeast-1:
+        AMI: ami-016d9487f00a79c1f
+    ap-southeast-2:
+        AMI: ami-0d3b0f35e53d60bf6
+    eu-central-1:
+        AMI: ami-0e8965a844618fda3
+    us-east-1:
+        AMI: ami-0a5a4ac0429d7c8ff
+    us-east-2:
+        AMI: ami-0a6a332195f0fc567
+    us-west-1:
+        AMI: ami-096ef0beee8ac55b4
+    us-west-2:
+        AMI: ami-063822708facaf800
+
+
+######################################
+## Declaration of stack resources
+######################################
+Resources:
+
+  ## ------------------------------------------------------------ #
+  ## Create Security Group for the HVR Bastion EC2 Instances
+  ##  -  Allow SSH, and Webdesktop via Bastion host to Hub
+  ##  -  Allow HVR port on internal subnet for communication with agents
+  ##  -  Allow EFS Port for Mount
+  ## ------------------------------------------------------------ #
+  HVRSecurityGroupBastion:
+    Condition: IsAcceptedEULA
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security Group for the HVR Bastion Host
+      VpcId:
+        Ref: VPCID
+      Tags:
+        - Key: Name
+          Value: !Sub hvr-bastion-SG-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+      SecurityGroupIngress:
+        ## Allow SSH
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp:
+            Ref: RemoteAccessCIDR
+        ## Allow Webdesktop
+        - IpProtocol: tcp
+          FromPort: 8080
+          ToPort: 8080
+          CidrIp:
+            Ref: RemoteAccessCIDR
+
+  ## ------------------------------------------------------------ #
+  ## Create the Auto Scaling Group for the HVR Bastion Host
+  ##  - 1 EC2 Instance running at a time
+  ## ------------------------------------------------------------ #
+  HvrBastionAutoScalingGroup:
+    Condition: IsAcceptedEULA
+    Type: "AWS::AutoScaling::AutoScalingGroup"
+    Properties:
+      AutoScalingGroupName: !Sub hvr-bastion-ASG-${TagEnvironment}
+      LaunchTemplate:
+        LaunchTemplateId: !Ref HvrBastionLaunchTemplate
+        Version: !GetAtt HvrBastionLaunchTemplate.LatestVersionNumber
+      VPCZoneIdentifier:
+        - !Ref PublicSubnet1
+        - !Ref PublicSubnet2
+      MinSize: "1"
+      MaxSize: "1"
+      Cooldown: "300"
+      DesiredCapacity: "1"
+      Tags:
+        - Key: Name
+          Value: !Sub HVRBastion-${TagEnvironment}
+          PropagateAtLaunch: true
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+          PropagateAtLaunch: true
+      TargetGroupARNs:
+        - !Ref HVRBastionNLBTargetGroup22
+        - !Ref HVRBastionNLBTargetGroup8080
+    CreationPolicy:
+      ResourceSignal:
+        Count: 1
+        Timeout: PT10M
+      AutoScalingCreationPolicy:
+        MinSuccessfulInstancesPercent: 100
+    UpdatePolicy:
+      AutoScalingReplacingUpdate:
+        WillReplace: true
+
+  ## ------------------------------------------------------------ #
+  ## Create the Launch Template for the HVR Bastion EC2 Instances
+  ## ------------------------------------------------------------ #
+  HvrBastionLaunchTemplate:
+    Condition: IsAcceptedEULA
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: !Sub hvr-bastion-LT-${TagEnvironment}
+      LaunchTemplateData:
+        KeyName: !Ref KeyName
+        ImageId:
+          Fn::FindInMap:
+            - RegionMap
+            - Ref: AWS::Region
+            - AMI
+        SecurityGroupIds:
+          - !Ref HVRSecurityGroupBastion
+        InstanceType: !Ref HVRInstanceTypeBastion
+        UserData: 
+          Fn::Base64: !Sub |
+            #!/bin/bash -x
+
+            systemctl stop hvr.socket
+            systemctl disable hvr.socket
+
+            function cfn_fail
+            {
+              /opt/aws/bin/cfn-signal -e 1 --stack ${AWS::StackName} --region ${AWS::Region} --resource HvrBastionAutoScalingGroup
+              exit 1
+            }
+
+            function cfn_success
+            {
+              /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource HvrBastionAutoScalingGroup
+              exit 0
+            }       
+
+            # just run cfn-signal 
+            cfn_success || cfn_fail
+
+## ------------------------------------------------------------ #
+  ## Create the Network Load Balancer for the HVR Hub
+  ## ------------------------------------------------------------ #
+  HVRBastionNLB:
+    Condition: IsAcceptedEULA
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Name: !Sub hvr-bastion-nlb-${TagEnvironment}
+      Scheme: internet-facing
+      Subnets:
+        - Ref: PublicSubnet1
+        - Ref: PublicSubnet2
+      Type: network
+      Tags:
+        - Key: Name
+          Value: !Sub hvr-bastion-nlb-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+
+
+  ## ------------------------------------------------------------ #
+  ## Create the Load Balancer Target Group for the Bastion Host port 22
+  ## ------------------------------------------------------------ #
+  HVRBastionNLBTargetGroup22:
+    Condition: IsAcceptedEULA
+    DependsOn: HVRBastionNLB
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub hvr-bastion-nlbTG-22-${TagEnvironment}
+      TargetType: instance
+      Port: 22
+      Protocol: TCP
+      VpcId: !Ref VPCID
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "60"
+      Tags:
+        - Key: Name
+          Value: !Sub hvr-bastion-nlb-target-port22-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+
+  ## ------------------------------------------------------------ #
+  ## Create the Load Balancer Target Group for the Bastion Host port 8080
+  ## ------------------------------------------------------------ #
+  HVRBastionNLBTargetGroup8080:
+    Condition: IsAcceptedEULA
+    DependsOn: HVRBastionNLB
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      Name: !Sub hvr-bastion-nlbTG-8080-${TagEnvironment}
+      TargetType: instance
+      Port: 8080
+      Protocol: TCP
+      VpcId: !Ref VPCID
+      TargetGroupAttributes:
+        - Key: deregistration_delay.timeout_seconds
+          Value: "60"
+      Tags:
+        - Key: Name
+          Value: !Sub hvr-bastion-nlb-target-port8080-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+
+  ## ------------------------------------------------------------ #
+  ## Create the Network Load Balancer Listener for the HVR Hub
+  ## ------------------------------------------------------------ #
+  HVRBastionNLBListener22:
+    Condition: IsAcceptedEULA
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref HVRBastionNLBTargetGroup22
+      LoadBalancerArn: !Ref HVRBastionNLB
+      Port: 22
+      Protocol: TCP
+
+  HVRBastionNLBListener8080:
+    Condition: IsAcceptedEULA
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref HVRBastionNLBTargetGroup8080
+      LoadBalancerArn: !Ref HVRBastionNLB
+      Port: 8080
+      Protocol: TCP
+
+######################################
+## Define stack output values
+######################################
+Outputs:
+
+  HVRBastionNLBDns:
+    Condition: IsAcceptedEULA
+    Description: HVR Bastion Host Access Point (Load Balancer DNS)
+    Value: !GetAtt HVRBastionNLB.DNSName
+
+

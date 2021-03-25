@@ -2,4 +2,12 @@
 // Briefly describe the software. Use consistent and clear branding. 
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-<Describe how the software works on AWS.>
+Looking to do more than simply migrate from your on-prem and other cloud databases onto AWS? Do you have multiple end points to deliver real-time data, continuously? If so, try HVR as your all in one high performing solution for integrating data continuously for real-time analytics.
+
+Easily move high volumes of data efficiently and securely with little to no latency. Log-based Change Data Capture (CDC) and compression features allow for fast, efficient and cost-effective data movement. Set-up is simple with a graphical user interface (GUI). Encryption capabilities keep your in-flight data secure.
+
+Get the complete set of features necessary to get your data integration project up and running from beginning to end: table creation and initial load, log-based CDC, data validation and repair, and monitoring.
+
+Supported data sources include commonly-used relational databases such as Oracle, SQL Server, DB2, PostgreSQL, and others. Destinations include an Amazon service like Redshift, RDS or S3, as well as many EC2-supported technologies, including Snowflake.
+
+To benefit from optimum network utilization and SSL data encryption, HVR must run in a distributed environment. Processes communicate over TPC/IP connections. To maximize efficiency run the HVR environment in the the same region and availability zone of the target database or service. 

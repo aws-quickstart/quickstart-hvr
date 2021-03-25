@@ -2,12 +2,16 @@
 
 ==== Prepare your AWS account
 
-_Describe any setup required in the AWS account prior to template launch_
+The template will create a VPC with a public and private subnet.  A bastion host will be created in the public subnet which will allow you to run the HVR GUI for configuring the HVR software components (HVR Hub and Agent) in the private subnet.
+In preperation you will need to make sure you deploy the HVR configuration in a region close to your destination into which you want to load data.  
+The templates will make use of the HVR BYOL Marketplace AMI image.  You will be required to load your license onto the HVR Hub system once the environment is deployed.
+To ensure High Availability for the HVR Hub configuration an EFS filesystem will be created as part of the quickstart deployment.  This EFS filesystem will be mounted into the EC2 instance running as the HVR Hub.  
+
 
 ==== Prepare your {partner-company-name} account
 
-_Describe any setup required in the partner portal/account prior to template launch_
+The Quickstart template will create a VPC with the specific HVR resources located within this VPC.  This include EC2 instances for the HVR Hub, Agent and a Bastion host.  In addition to this an Aurora Postgresql database will be created.  This is optional if you already have a database enviornment available for use as the HVR Hub Database.  
 
 ==== Prepare for the deployment
 
-_Describe any preparation required to complete the product build, such as obtaining licenses or placing files in S3_
+To ensure secure communication between the HVR components (HVR Hub and Agents) a pair of public and private certificates is used.  The template will provide a default set of keys which can be used, however we do recommend that these are only used for evalution and that you generate your own keys and use them - see the parameter section for HVRPubKeyBase64 and HVRPrivKeyBase64 parameters.  These keys can be created using either openssl or using the HVR hvrsslgen utility.  For more detail please see the HVR online documentation.

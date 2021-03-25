@@ -1,0 +1,18 @@
+project:
+  name: quickstart-hvr
+  regions:
+    - ap-southeast-2
+
+tests:
+  quickstart-hvr-test:
+    template: templates/hvr-main-vpc.template.yaml
+    parameters:
+      AcceptedEULA: 'yes'
+      AvailabilityZones: $[taskcat_genaz_2]
+      RemoteAccessCIDR: 0.0.0.0/0
+      KeyName: ae-syd-kp
+      EnablePGStack: 'false'
+      TagEnvironment: 'test'
+    regions:
+      - ap-southeast-2
+

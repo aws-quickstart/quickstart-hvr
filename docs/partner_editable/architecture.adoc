@@ -21,9 +21,20 @@ internet access for resources in the private subnets.*
 ** A Linux bastion host in an Auto Scaling group to allow inbound Secure
 Shell (SSH) access to EC2 instances in public and private subnets.*
 * In the private subnets:
-** <item>.
-** <item>.
+** The HVR Hub host (Linux based) in an Auto Scaling group behind a network load balancer.  
+Only one HVR Hub instance will be created, with an EFS filesystem attached.  In case of failure, a new HVR Hub host will
+be created and attached to the EFS filesystem.
+** Two HVR Agent hosts (Linux based) in an Auto Scaling group behind a Network Load Balancer will be created.  
+** Optional:  Even though optional, it is recommended to create the Aurora Postgresql database for use as the HVR Hub repository database.
+
 // Add bullet points for any additional components that are included in the deployment. Make sure that the additional components are also represented in the architecture diagram. End each bullet with a period.
-* <describe any additional components>.
+* Bastion host - based on HVR BYOL Marketplace Image.
+* HVR Hub Instance - based on HVR BYOL Marketplace Image.
+* HVR Agent Instances (2) - based on HVR BYOL Marketplace Image.
+* Network Load Balancers.
+* Secrets Manager secrets - Used for Database and OS User Passwords.
+* Secrets Maanger secrets - Used for the HVR Public/Private certificates for secure communication.
+* Aurora Postgresql - Database used as HVR Hub Repository.
+
 
 [.small]#* The template that deploys the Quick Start into an existing VPC skips the components marked by asterisks and prompts you for your existing VPC configuration.#

@@ -4,4 +4,13 @@
 
 This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for users who <target audience and usage scenario>
+Looking to do more than simply migrate from your on-prem and other cloud databases onto AWS? Do you have multiple end points to deliver real-time data, continuously? If so, try HVR as your all in one high performing solution for integrating data continuously for real-time analytics.
+
+Easily move high volumes of data efficiently and securely with little to no latency. Log-based Change Data Capture (CDC) and compression features allow for fast, efficient and cost-effective data movement. Set-up is simple with a graphical user interface (GUI). Encryption capabilities keep your in-flight data secure.
+
+Highlights:
+
+*  Seamless delivery onto multiple AWS and other targets simultaneously (such as S3, RDS, Redshift, Aurora, Snowflake)
+*  Integrate from multiple databases on-prem or in the cloud, commonly used on-prem technologies and AWS services are supported
+*  Performance and scalability: log-based change data capture and compressed data transfer enable high speed and low latency
+

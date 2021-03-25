@@ -20,4 +20,6 @@ _Add any security-related information._
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
-_Add any other details that will help the customer use the software on AWS._
+HVR Software Website:  https://www.hvr-software.com/
+Documentation:  https://www.hvr-software.com/docs/5
+Whitepapers:  https://www.hvr-software.com/resources/whitepapers/

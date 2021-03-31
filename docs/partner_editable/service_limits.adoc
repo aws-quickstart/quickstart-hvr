@@ -4,6 +4,9 @@
 
 // Space needed to maintain table headers
 |VPCs |1
+|Subnets |2
+|NAT Gateway |1
+|Internet Gateway|1
 |Security groups |3
 |AWS Identity and Access Management (IAM) roles |1
 |Auto Scaling groups |3

@@ -1,25 +1,28 @@
 // Add steps as necessary for accessing the software, post-configuration, and testing. Don’t include full usage instructions for your software, but add links to your product documentation for that information.
 //Should any sections not be applicable, remove them
 
-== Test the deployment
+// == Test the deployment
 // If steps are required to test the deployment, add them here. If not, remove the heading
 
-== Post-deployment steps
+// == Post-deployment steps
 // If post-deployment steps are required, add them here. If not, remove the heading
 
-== Best practices for using {partner-product-short-name} on AWS
+// == Best practices for using {partner-product-short-name} on AWS
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
-_Add any best practices for using the software._
+//_Add any best practices for using the software._
 
-== Security
+//== Security
 // Provide post-deployment best practices for using the technology on AWS, including considerations such as migrating data, backups, ensuring high performance, high availability, etc. Link to software documentation for detailed information.
 
-_Add any security-related information._
+//_Add any security-related information._
 
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
-HVR Software Website:  https://www.hvr-software.com/
-Documentation:  https://www.hvr-software.com/docs/5
-Whitepapers:  https://www.hvr-software.com/resources/whitepapers/
+For more detail on HVR Software, including documentation and whitepapers please see the following links
+
+*  https://www.hvr-software.com/[HVR Software Website^]
+*  https://www.hvr-software.com/solutions/aws-data-integration-hybrid-cloud/[HVR Software and AWS^]
+*  https://www.hvr-software.com/docs/5[HVR Online Documentation^]
+*  https://www.hvr-software.com/resources/whitepapers/[Whitepapers^]

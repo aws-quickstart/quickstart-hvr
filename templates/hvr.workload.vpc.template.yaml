@@ -177,7 +177,7 @@ Parameters:
   HVRPubKeyBase64:
     Description: |
       Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.  
-      A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert | base64"
+      A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert \| base64"
     Type: String
     NoEcho: true
     Default: |
@@ -205,7 +205,7 @@ Parameters:
   HVRPrivKeyBase64:
     Description: |
       Specify HVR private key (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.  
-      A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert | base64"
+      A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert \| base64"
     Type: String
     NoEcho: true
     Default: |

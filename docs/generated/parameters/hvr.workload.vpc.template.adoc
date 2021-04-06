@@ -56,7 +56,7 @@ U2ZVWG1YR0dSMkNETlhYaDVHeVJpWlpFQUlpSHBoR21LClMyUHZlREJPN1B1RDdCcWpqK1BkcE5x
 UFdzVTN5M3dabHZhcjBkT3NKYWZXSmlYb2x0ay9wZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0t
 LS0K
 `|Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.  
-A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert | base64"
+A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert \| base64"
 |HVR Private Key (base64)
 (`HVRPrivKeyBase64`)|`LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLQpNSUlGTFRCWEJna3Foa2lHOXcw
 QkJRMHdTakFwQmdrcWhraUc5dzBCQlF3d0hBUUlDenVUbmhMbDBZOENBZ2dBCk1Bd0dDQ3FHU0li
@@ -92,6 +92,6 @@ L3JOZE5lbWZ6Q0VlZnhLSTIKUkN3WFhLeDBuOHNBakc4Y2JmQVJ5eERSK1hoYU1tUTdDeXFiNDJU
 TzdHOEdlK2VMSEhLWnFSWFlEengzaWxsWAoraGNpd005dXNyZ215bFpJcXZkWjdZS2dNNkFVTURY
 bDNHYms2N3RzT0l2LwotLS0tLUVORCBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLQo=
 `|Specify HVR private key (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.  
-A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert | base64"
+A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert \| base64"
 
 |===

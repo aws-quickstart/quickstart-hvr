@@ -169,26 +169,30 @@ Parameters:
   HVRInstanceTypeHUB:
     Description: EC2 instance type - for HVR HUB
     Type: String
-    Default: c4.large
+    Default: c5.large
     AllowedValues:
       [
-        c4.large,
-        c4.xlarge,
-        c4.2xlarge,
-        c4.4xlarge,
+        c5.large,
+        c5.xlarge,
+        c5.2xlarge
+        c5d.large,
+        c5d.xlarge,
+        c5d.2xlarge
       ]
     ConstraintDescription: Must be a valid EC2 instance type.
 
   HVRInstanceTypeAgent:
     Description: EC2 instance type - for HVR Agent running Capture/Integrate
     Type: String
-    Default: c4.large
+    Default: c5.large
     AllowedValues: 
       [
-        c4.large,
-        c4.xlarge,
-        c4.2xlarge,
-        c4.4xlarge,
+        c5.large,
+        c5.xlarge,
+        c5.2xlarge
+        c5d.large,
+        c5d.xlarge,
+        c5d.2xlarge
       ]
     ConstraintDescription: Must be a valid EC2 instance type.
 

@@ -169,26 +169,30 @@ Parameters:
   HVRInstanceTypeHUB:
     Description: EC2 instance type - for HVR HUB
     Type: String
-    Default: c4.large
+    Default: c5.large
     AllowedValues:
       [
-        c4.large,
-        c4.xlarge,
-        c4.2xlarge,
-        c4.4xlarge,
+        c5.large,
+        c5.xlarge,
+        c5.2xlarge
+        c5d.large,
+        c5d.xlarge,
+        c5d.2xlarge
       ]
     ConstraintDescription: Must be a valid EC2 instance type.
 
   HVRInstanceTypeAgent:
     Description: EC2 instance type - for HVR Agent running Capture/Integrate
     Type: String
-    Default: c4.large
+    Default: c5.large
     AllowedValues: 
       [
-        c4.large,
-        c4.xlarge,
-        c4.2xlarge,
-        c4.4xlarge,
+        c5.large,
+        c5.xlarge,
+        c5.2xlarge
+        c5d.large,
+        c5d.xlarge,
+        c5d.2xlarge
       ]
     ConstraintDescription: Must be a valid EC2 instance type.
 
@@ -233,14 +237,14 @@ Parameters:
     Default: "dev"
 
   QSS3BucketRegion:
-    Default: "ap-southeast-2"
+    Default: "us-east-1"
     Description: "The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value."
     Type: String
 
   QSS3BucketName:
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
     ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Default: "ae-quickstart-aws-hvr"
+    Default: "quickstart-hvr"
     Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     Type: String
 
@@ -258,7 +262,7 @@ Parameters:
 Conditions:
   UsingDefaultBucket: !Equals 
     - !Ref QSS3BucketName
-    -  "quickstart-aws-hvr"
+    -  "aws-quickstart"
 
   CreatePGStack: !Equals
     - !Ref EnablePGStack
@@ -284,7 +288,7 @@ Resources:
           - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-aws-vpc/templates/aws-vpc.template.yaml
           - S3Bucket: !If
               - UsingDefaultBucket
-              - !Sub "quickstart-hvr-${AWS::Region}"
+              - !Sub "aws-quickstart-${AWS::Region}"
               - !Ref "QSS3BucketName"
             S3Region: !If
               - UsingDefaultBucket
@@ -314,7 +318,7 @@ Resources:
           - 'https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.bastion.template.yaml'
           - S3Bucket: !If
               - UsingDefaultBucket
-              - !Sub "quickstart-hvr-${AWS::Region}"
+              - !Sub "aws-quickstart-${AWS::Region}"
               - !Ref "QSS3BucketName"
             S3Region: !If
               - UsingDefaultBucket
@@ -340,7 +344,7 @@ Resources:
           - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}templates/hvr.workload.vpc.template.yaml
           - S3Bucket: !If
               - UsingDefaultBucket
-              - !Sub "quickstart-hvr-${AWS::Region}"
+              - !Sub "aws-quickstart-${AWS::Region}"
               - !Ref "QSS3BucketName"
             S3Region: !If
               - UsingDefaultBucket
@@ -406,7 +410,7 @@ Resources:
         - https://${S3Bucket}.s3.${S3Region}.${AWS::URLSuffix}/${QSS3KeyPrefix}submodules/quickstart-amazon-aurora-postgresql/templates/aurora_postgres.template.yaml
         - S3Bucket: !If
             - UsingDefaultBucket
-            - !Sub "quickstart-hvr-${AWS::Region}"
+            - !Sub "aws-quickstart-${AWS::Region}"
             - !Ref "QSS3BucketName"
           S3Region: !If
             - UsingDefaultBucket

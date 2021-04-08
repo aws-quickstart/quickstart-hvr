@@ -128,26 +128,30 @@ Parameters:
   HVRInstanceTypeHUB:
     Description: General Purpose EC2 instance - Recommended for HUB only Instances
     Type: String
-    Default: c4.large
+    Default: c5.large
     AllowedValues:
       [
-        c4.large,
-        c4.xlarge,
-        c4.2xlarge,
-        c4.4xlarge,
+        c5.large,
+        c5.xlarge,
+        c5.2xlarge
+        c5d.large,
+        c5d.xlarge,
+        c5d.2xlarge
       ]
     ConstraintDescription: Must be a valid EC2 instance type.
 
   HVRInstanceTypeAgent:
     Description: Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate
     Type: String
-    Default: c4.large
+    Default: c5.large
     AllowedValues: 
       [
-        c4.large,
-        c4.xlarge,
-        c4.2xlarge,
-        c4.4xlarge,
+        c5.large,
+        c5.xlarge,
+        c5.2xlarge
+        c5d.large,
+        c5d.xlarge,
+        c5d.2xlarge
       ]
     ConstraintDescription: Must be a valid EC2 instance type.
 
@@ -268,37 +272,39 @@ Conditions:
 Mappings:
   RegionMap:
     eu-north-1:
-        AMI: ami-0f07016ab7c03d800
+      AMI: ami-0220c0c08d6ebf5e8
     ap-south-1:
-        AMI: ami-085b30b437e823da7
+      AMI: ami-0aec7e99e59843058
     eu-west-3:
-        AMI: ami-062b667b368b18a2f
+      AMI: ami-02a90529e3954c1ca
     eu-west-2:
-        AMI: ami-0004fb5249214d11c
+      AMI: ami-07f7e5cf369953bf3
     eu-west-1:
-        AMI: ami-0c03e7108b82481b5
+      AMI: ami-05a15301ffee1f68d
+    ap-northeast-3:
+      AMI: ami-079c51d32043715a0
     ap-northeast-2:
-        AMI: ami-02741b7d524051f33
+      AMI: ami-0252c9b13e7ccaac9
     ap-northeast-1:
-        AMI: ami-06dda44c8494968ce
+      AMI: ami-0f6ebae8c0c309639
     sa-east-1:
-        AMI: ami-003e4a6a1f53c42af
+      AMI: ami-0a34968d8292ce9f7
     ca-central-1:
-        AMI: ami-0d10d597241549c03
+      AMI: ami-015d2e46d63118878
     ap-southeast-1:
-        AMI: ami-016d9487f00a79c1f
+      AMI: ami-01048650a03e0ebbd
     ap-southeast-2:
-        AMI: ami-0d3b0f35e53d60bf6
+      AMI: ami-04df8d21db94207c4
     eu-central-1:
-        AMI: ami-0e8965a844618fda3
+      AMI: ami-0008de55175eca447
     us-east-1:
-        AMI: ami-0a5a4ac0429d7c8ff
+      AMI: ami-0e1dfff22cdac3a13
     us-east-2:
-        AMI: ami-0a6a332195f0fc567
+      AMI: ami-0200d7e7c1b7ac5d1
     us-west-1:
-        AMI: ami-096ef0beee8ac55b4
+      AMI: ami-01834975409566f89
     us-west-2:
-        AMI: ami-063822708facaf800
+      AMI: ami-0665273102b9bf5c0
 
 
 ######################################
@@ -352,6 +358,54 @@ Resources:
           Value: !Sub ${TagEnvironment}
 
   ## ------------------------------------------------------------ #
+  ## Create S3 Bucket to store NLB Access Logs
+  ## - explicit block public access
+  ## ------------------------------------------------------------ #
+  NLBAccessLogsBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  ## ------------------------------------------------------------ #
+  ## Create S3 Bucket Policy (NLB Access Logs)
+  ## ------------------------------------------------------------ #
+  NLBAccessLogsBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: NLBAccessLogsBucketPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: "AWSLogDeliveryWrite"
+            Effect: Allow
+            Principal: 
+              Service: "delivery.logs.amazonaws.com"
+            Action: 's3:PutObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref NLBAccessLogsBucket
+                - /AWSLogs/
+                - !Ref AWS::AccountId
+                - /*
+          - Sid: "AWSLogDeliveryAclCheck"
+            Effect: Allow
+            Principal: 
+              Service: "delivery.logs.amazonaws.com"
+            Action: 's3:GetBucketAcl'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref NLBAccessLogsBucket
+      Bucket: !Ref NLBAccessLogsBucket
+
+  ## ------------------------------------------------------------ #
   ## Create Security Group for the HVR Agent EC2 Instances
   ##  -  Allow SSH, and Webdesktop via Bastion host to Hub
   ##  -  Allow HVR port on internal subnet for communication with agents
@@ -374,46 +428,53 @@ Resources:
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PublicSubnet1CIDR
+          CidrIp: !Ref PublicSubnet1CIDR
+          Description: Allow HVR Port 4343 on Public Subnet1 
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PublicSubnet2CIDR
+          CidrIp: !Ref PublicSubnet2CIDR
+          Description: Allow HVR Port 4343 on Public Subnet1 
         ## Bastion SSH to Hub
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp:
-            Ref: PublicSubnet1CIDR
+          CidrIp: !Ref PublicSubnet1CIDR
+          Description: Allow SSH in Public Subnet1 
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp:
-            Ref: PublicSubnet2CIDR
+          CidrIp: !Ref PublicSubnet2CIDR
+          Description: Allow SSH in Public Subnet2
         ## HVR Agent Communication
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PrivateSubnet1CIDR
+          CidrIp: !Ref PrivateSubnet1CIDR
+          Description: Allow HVR Port 4343 on private Subnet1 
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PrivateSubnet2CIDR
+          CidrIp: !Ref PrivateSubnet2CIDR
+          Description: Allow HVR Port 4343 on private Subnet2 
         ## EFS
         - IpProtocol: tcp
           FromPort: 2049
           ToPort: 2049
-          CidrIp:
-            Ref: PrivateSubnet1CIDR
+          CidrIp: !Ref PrivateSubnet1CIDR
+          Description: Allow EFS on private Subnet1 
         - IpProtocol: tcp
           FromPort: 2049
           ToPort: 2049
-          CidrIp:
-            Ref: PrivateSubnet2CIDR
+          CidrIp: !Ref PrivateSubnet2CIDR
+          Description: Allow EFS on private Subnet1 
+      SecurityGroupEgress:
+        ## Allow TCP outbound 
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+          Description: Allow outbound TCP access 
 
   ## ------------------------------------------------------------ #
   ## Create Security Group for the HVR Agent EC2 Instances
@@ -436,22 +497,29 @@ Resources:
           ToPort: 4343
           CidrIp:
             Ref: PrivateSubnet1CIDR
+          Description: Allow HVR Port 4343 on private Subnet1 
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PrivateSubnet2CIDR
+          CidrIp: !Ref PrivateSubnet2CIDR
+          Description: Allow HVR Port 4343 on private Subnet2 
         ## ssh in private subnets
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp:
-            Ref: PrivateSubnet1CIDR
+          CidrIp: !Ref PrivateSubnet1CIDR
+          Description: Allow SSH on private Subnet1
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp:
-            Ref: PrivateSubnet2CIDR
+          CidrIp: !Ref PrivateSubnet2CIDR
+          Description: Allow SSH on private Subnet2
+        ## Allow TCP outbound 
+        - IpProtocol: tcp
+          FromPort: 0
+          ToPort: 65535
+          CidrIp: 0.0.0.0/0
+          Description: Allow outbound TCP access 
 
   ## ------------------------------------------------------------ #
   ## Create EFS Filesystem 
@@ -723,8 +791,13 @@ Resources:
     Condition: IsAcceptedEULA
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub hvr-hub-nlb-${TagEnvironment}
       Scheme: internal
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: "true"
+        - Key: access_logs.s3.bucket
+          Value: 
+            !Ref NLBAccessLogsBucket
       Subnets:
         - Ref: PrivateSubnet1
         - Ref: PrivateSubnet2
@@ -742,8 +815,13 @@ Resources:
     Condition: IsAcceptedEULA
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
-      Name: !Sub hvr-agent-nlb-${TagEnvironment}
       Scheme: internal
+      LoadBalancerAttributes:
+        - Key: access_logs.s3.enabled
+          Value: "true"
+        - Key: access_logs.s3.bucket
+          Value: 
+            !Ref NLBAccessLogsBucket
       Subnets:
         - Ref: PrivateSubnet1
         - Ref: PrivateSubnet2
@@ -922,7 +1000,6 @@ Resources:
               - Action:
                   - ec2:DescribeRegions
                   - iam:ListRoles
-                  - iam:PassRole
                   - s3:GetBucketNotification
                   - s3:ListAllMyBuckets
                   - s3:PutBucketNotification

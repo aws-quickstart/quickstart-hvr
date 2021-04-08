@@ -4,4 +4,13 @@
 
 This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for users who <target audience and usage scenario>
+HVR’s real-time data replication technology enables organizations to plan, predict, and respond with the freshest data available.  With HVR, you can easily move high volumes of data efficiently and securely with little to no latency. Log-based Change Data Capture (CDC) and compression features allow for fast, efficient and cost-effective data movement. 
+The set-up is simple with a graphical user interface (GUI). Encryption capabilities keep your in-flight data secure. +
+
+Highlights of the HVR Software features include:
+
+*  Seamless delivery onto multiple AWS and other targets simultaneously (such as S3, RDS, Redshift, Aurora, Snowflake)
+*  Integrate from multiple databases on-prem or in the cloud, commonly used on-prem technologies and AWS services are supported
+*  Performance and scalability: log-based change data capture and compressed data transfer enable high speed and low latency
+
+This Quick Start helps you create an HVR Hub and repository as well as an HVR Agent configuration in a new VPC within your AWS account.  The HVR BYOL Marketplace Image is used which is already pre-installed with the HVR software ready for you to start using with your existing license.  

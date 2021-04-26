@@ -371,6 +371,10 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'aws:kms'
 
   ## ------------------------------------------------------------ #
   ## Create S3 Bucket Policy (NLB Access Logs)
@@ -495,8 +499,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PrivateSubnet1CIDR
+          CidrIp: !Ref PrivateSubnet1CIDR
           Description: Allow HVR Port 4343 on private Subnet1 
         - IpProtocol: tcp
           FromPort: 4343
@@ -514,6 +517,7 @@ Resources:
           ToPort: 22
           CidrIp: !Ref PrivateSubnet2CIDR
           Description: Allow SSH on private Subnet2
+      SecurityGroupEgress:
         ## Allow TCP outbound 
         - IpProtocol: tcp
           FromPort: 0
@@ -529,6 +533,8 @@ Resources:
     Type: AWS::EFS::FileSystem
     Properties:
       PerformanceMode: generalPurpose
+      # Enable default encryption on EFS filesystem
+      Encrypted: true
       FileSystemTags:
         - Key: Name
           Value: !Sub HVREFS-${AWS::StackName}-${TagEnvironment}
@@ -911,7 +917,6 @@ Resources:
     Condition: IsAcceptedEULA
     Type: AWS::IAM::Role    
     Properties:
-      RoleName: !Sub hvr-role-${TagEnvironment}
       Description: HVR Role that will be used in EC2 instance profile for the HVR Hub and Agent.
       Tags:
         - Key: Name
@@ -928,88 +933,92 @@ Resources:
       Policies:
         - PolicyDocument:
             Version: 2012-10-17
-            Statement:
-              - Action:
-                  - s3:ListAllMyBuckets
-                  - s3:ListBucket
-                  - s3:GetObject
-                  - s3:PutObject
-                  - s3:DeleteObject
-                  - s3:GetBucketLocation
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinS3
-              - Action:
-                  - sqs:DeleteMessage
-                  - sqs:ListQueues
-                  - sqs:ReceiveMessage
-                  - sqs:SendMessage
-                  - sqs:GetQueueUrl
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinSQS
-              - Action:
-                  - rds:DescribeDBInstances
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinRDS
-              - Action:
-                  - ec2:CreateSnapshot
-                  - ec2:CreateTags
-                  - ec2:DescribeInstances
-                  - ec2:DescribeVolumes
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinEC2
-              - Action:
-                  - sns:ListTopics
-                  - sns:CreateTopic
-                  - sns:Publish
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinSNS
-              - Action:
-                  - cloudwatch:PutMetricData
-                  - cloudwatch:ListMetrics
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinCloudwatch
-              - Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - logs:DescribeLogStreams
-                Effect: Allow
-                Resource:
-                  - arn:aws:logs:*:*:*
-                Sid: StmtMinCloudwatchLogs
-              - Action:
-                  - kms:ListAliases
-                  - kms:Encrypt
-                  - kms:Decrypt
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinKMS
-              - Action:
-                  - ec2:DescribeRegions
-                  - iam:ListRoles
-                  - s3:GetBucketNotification
-                  - s3:ListAllMyBuckets
-                  - s3:PutBucketNotification
-                  - sqs:ChangeMessageVisibility
-                  - sqs:DeleteMessage
-                  - sqs:ListQueues
-                  - sqs:ReceiveMessage
-                Effect: Allow
-                Resource: "*"
-                Sid: CDCPermissions
+            Statement:                        
+              #####
+              # Uncomment the required permissions depending on what service will be used, example RDS or S3
+              # This will require the explicit set of the RESOURCE to only allow access to the resource and not using * for all of the account
+              #####
+              # - Action:
+              #     - s3:ListAllMyBuckets
+              #     - s3:ListBucket
+              #     - s3:GetObject
+              #     - s3:PutObject
+              #     - s3:DeleteObject
+              #     - s3:GetBucketLocation
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinS3
+              # - Action:
+              #     - sqs:DeleteMessage
+              #     - sqs:ListQueues
+              #     - sqs:ReceiveMessage
+              #     - sqs:SendMessage
+              #     - sqs:GetQueueUrl
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinSQS
+              # - Action:
+              #     - rds:DescribeDBInstances
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinRDS
+              # - Action:
+              #     - ec2:CreateSnapshot
+              #     - ec2:CreateTags
+              #     - ec2:DescribeInstances
+              #     - ec2:DescribeVolumes
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinEC2
+              # - Action:
+              #     - sns:ListTopics
+              #     - sns:CreateTopic
+              #     - sns:Publish
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinSNS
+              # - Action:
+              #     - cloudwatch:PutMetricData
+              #     - cloudwatch:ListMetrics
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinCloudwatch
+              # - Action:
+              #     - logs:CreateLogGroup
+              #     - logs:CreateLogStream
+              #     - logs:PutLogEvents
+              #     - logs:DescribeLogStreams
+              #   Effect: Allow
+              #   Resource:
+              #     - arn:aws:logs:*:*:*
+              #   Sid: StmtMinCloudwatchLogs
+              # - Action:
+              #     - kms:ListAliases
+              #     - kms:Encrypt
+              #     - kms:Decrypt
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinKMS
+              # - Action:
+              #     - ec2:DescribeRegions
+              #     - iam:ListRoles
+              #     - s3:GetBucketNotification
+              #     - s3:ListAllMyBuckets
+              #     - s3:PutBucketNotification
+              #     - sqs:ChangeMessageVisibility
+              #     - sqs:DeleteMessage
+              #     - sqs:ListQueues
+              #     - sqs:ReceiveMessage
+              #   Effect: Allow
+              #   Resource: "*"
+              #   Sid: CDCPermissions
               - Effect: Allow
                 Action:
                   - "secretsmanager:GetSecretValue"

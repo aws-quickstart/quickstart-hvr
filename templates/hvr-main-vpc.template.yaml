@@ -326,7 +326,7 @@ Resources:
               - !Ref "QSS3BucketRegion"
       Parameters:
         VPCID: !GetAtt VPCStack.Outputs.VPCID
-        VPCCIRD: !Ref VPCCIDR
+        VPCCIDR: !Ref VPCCIDR
         PublicSubnet1: !GetAtt VPCStack.Outputs.PublicSubnet1ID
         PublicSubnet2: !GetAtt VPCStack.Outputs.PublicSubnet2ID
         RemoteAccessCIDR: !Ref RemoteAccessCIDR

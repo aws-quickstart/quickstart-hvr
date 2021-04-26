@@ -371,6 +371,10 @@ Resources:
         BlockPublicPolicy: true
         IgnorePublicAcls: true
         RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: 'aws:kms'
 
   ## ------------------------------------------------------------ #
   ## Create S3 Bucket Policy (NLB Access Logs)
@@ -495,8 +499,7 @@ Resources:
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp:
-            Ref: PrivateSubnet1CIDR
+          CidrIp: !Ref PrivateSubnet1CIDR
           Description: Allow HVR Port 4343 on private Subnet1 
         - IpProtocol: tcp
           FromPort: 4343
@@ -514,6 +517,7 @@ Resources:
           ToPort: 22
           CidrIp: !Ref PrivateSubnet2CIDR
           Description: Allow SSH on private Subnet2
+      SecurityGroupEgress:
         ## Allow TCP outbound 
         - IpProtocol: tcp
           FromPort: 0
@@ -529,6 +533,8 @@ Resources:
     Type: AWS::EFS::FileSystem
     Properties:
       PerformanceMode: generalPurpose
+      # Enable default encryption on EFS filesystem
+      Encrypted: true
       FileSystemTags:
         - Key: Name
           Value: !Sub HVREFS-${AWS::StackName}-${TagEnvironment}
@@ -911,7 +917,6 @@ Resources:
     Condition: IsAcceptedEULA
     Type: AWS::IAM::Role    
     Properties:
-      RoleName: !Sub hvr-role-${TagEnvironment}
       Description: HVR Role that will be used in EC2 instance profile for the HVR Hub and Agent.
       Tags:
         - Key: Name

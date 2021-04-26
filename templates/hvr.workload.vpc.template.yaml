@@ -933,88 +933,92 @@ Resources:
       Policies:
         - PolicyDocument:
             Version: 2012-10-17
-            Statement:
-              - Action:
-                  - s3:ListAllMyBuckets
-                  - s3:ListBucket
-                  - s3:GetObject
-                  - s3:PutObject
-                  - s3:DeleteObject
-                  - s3:GetBucketLocation
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinS3
-              - Action:
-                  - sqs:DeleteMessage
-                  - sqs:ListQueues
-                  - sqs:ReceiveMessage
-                  - sqs:SendMessage
-                  - sqs:GetQueueUrl
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinSQS
-              - Action:
-                  - rds:DescribeDBInstances
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinRDS
-              - Action:
-                  - ec2:CreateSnapshot
-                  - ec2:CreateTags
-                  - ec2:DescribeInstances
-                  - ec2:DescribeVolumes
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinEC2
-              - Action:
-                  - sns:ListTopics
-                  - sns:CreateTopic
-                  - sns:Publish
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinSNS
-              - Action:
-                  - cloudwatch:PutMetricData
-                  - cloudwatch:ListMetrics
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinCloudwatch
-              - Action:
-                  - logs:CreateLogGroup
-                  - logs:CreateLogStream
-                  - logs:PutLogEvents
-                  - logs:DescribeLogStreams
-                Effect: Allow
-                Resource:
-                  - arn:aws:logs:*:*:*
-                Sid: StmtMinCloudwatchLogs
-              - Action:
-                  - kms:ListAliases
-                  - kms:Encrypt
-                  - kms:Decrypt
-                Effect: Allow
-                Resource:
-                  - "*"
-                Sid: StmtMinKMS
-              - Action:
-                  - ec2:DescribeRegions
-                  - iam:ListRoles
-                  - s3:GetBucketNotification
-                  - s3:ListAllMyBuckets
-                  - s3:PutBucketNotification
-                  - sqs:ChangeMessageVisibility
-                  - sqs:DeleteMessage
-                  - sqs:ListQueues
-                  - sqs:ReceiveMessage
-                Effect: Allow
-                Resource: "*"
-                Sid: CDCPermissions
+            Statement:                        
+              #####
+              # Uncomment the required permissions depending on what service will be used, example RDS or S3
+              # This will require the explicit set of the RESOURCE to only allow access to the resource and not using * for all of the account
+              #####
+              # - Action:
+              #     - s3:ListAllMyBuckets
+              #     - s3:ListBucket
+              #     - s3:GetObject
+              #     - s3:PutObject
+              #     - s3:DeleteObject
+              #     - s3:GetBucketLocation
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinS3
+              # - Action:
+              #     - sqs:DeleteMessage
+              #     - sqs:ListQueues
+              #     - sqs:ReceiveMessage
+              #     - sqs:SendMessage
+              #     - sqs:GetQueueUrl
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinSQS
+              # - Action:
+              #     - rds:DescribeDBInstances
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinRDS
+              # - Action:
+              #     - ec2:CreateSnapshot
+              #     - ec2:CreateTags
+              #     - ec2:DescribeInstances
+              #     - ec2:DescribeVolumes
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinEC2
+              # - Action:
+              #     - sns:ListTopics
+              #     - sns:CreateTopic
+              #     - sns:Publish
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinSNS
+              # - Action:
+              #     - cloudwatch:PutMetricData
+              #     - cloudwatch:ListMetrics
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinCloudwatch
+              # - Action:
+              #     - logs:CreateLogGroup
+              #     - logs:CreateLogStream
+              #     - logs:PutLogEvents
+              #     - logs:DescribeLogStreams
+              #   Effect: Allow
+              #   Resource:
+              #     - arn:aws:logs:*:*:*
+              #   Sid: StmtMinCloudwatchLogs
+              # - Action:
+              #     - kms:ListAliases
+              #     - kms:Encrypt
+              #     - kms:Decrypt
+              #   Effect: Allow
+              #   Resource:
+              #     - "*"
+              #   Sid: StmtMinKMS
+              # - Action:
+              #     - ec2:DescribeRegions
+              #     - iam:ListRoles
+              #     - s3:GetBucketNotification
+              #     - s3:ListAllMyBuckets
+              #     - s3:PutBucketNotification
+              #     - sqs:ChangeMessageVisibility
+              #     - sqs:DeleteMessage
+              #     - sqs:ListQueues
+              #     - sqs:ReceiveMessage
+              #   Effect: Allow
+              #   Resource: "*"
+              #   Sid: CDCPermissions
               - Effect: Allow
                 Action:
                   - "secretsmanager:GetSecretValue"

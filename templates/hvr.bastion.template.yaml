@@ -12,7 +12,7 @@ Description: >-
   
   **WARNING**
   This template creates EC2 instance a Network Load Balancer and related resources. 
-  You will be billed for the AWS resources used if you create a stack from this template.
+  You will be billed for the AWS resources used if you create a stack from this template.(qs-1roo3sq6e)
 
 ######################################
 ## Stack Metadata

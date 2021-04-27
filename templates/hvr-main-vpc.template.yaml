@@ -8,12 +8,15 @@ Description: >-
   This main template creates a VPC for deployment of HVR on AWS. 
   **WARNING**
   This template creates EC2 instances and related resources. You will be billed
-  for the AWS resources used if you create a stack from this template.
+  for the AWS resources used if you create a stack from this template.(qs-1roo3sq66)
 
 ######################################
 ## Stack Metadata
 ######################################
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into a new VPC"
+    Order: 1
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:

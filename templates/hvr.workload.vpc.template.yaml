@@ -27,6 +27,7 @@ Metadata:
           default: "VPC network configuration"
         Parameters:
           - VPCID
+          - VPCCIDR
           - PrivateSubnet1
           - PrivateSubnet2
           - PublicSubnet1CIDR
@@ -54,6 +55,8 @@ Metadata:
         default: Accepted EULA from AWS Marketplace
       VPCID:
         default: VPCID ID
+      VPCCIDR:
+        default: CIDR Block for the VPC
       PrivateSubnet1:
         default: Private subnet 1 ID
       PrivateSubnet2:
@@ -100,6 +103,13 @@ Parameters:
     Type: AWS::EC2::VPC::Id
     Description: The ID of the existing VPC that contains the subnets.
 
+  VPCCIDR:
+    AllowedPattern: ^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\/(1[6-9]|2[0-8]))$
+    ConstraintDescription: CIDR block parameter must be in the form x.x.x.x/16-28
+    Default: 10.0.0.0/16
+    Description: CIDR block for the VPC
+    Type: String
+
   PrivateSubnet1:
     Description: "An existing private subnet 1 to launch secondary resources (e.g. PostgresSQL database)."
     Type: AWS::EC2::Subnet::Id
@@ -134,6 +144,9 @@ Parameters:
     Default: c5.large
     AllowedValues:
       [
+        t3.small,
+        t3.medium,
+        t3.large,
         c5.large,
         c5.xlarge,
         c5.2xlarge
@@ -149,6 +162,9 @@ Parameters:
     Default: c5.large
     AllowedValues: 
       [
+        t3.small,
+        t3.medium,
+        t3.large,
         c5.large,
         c5.xlarge,
         c5.2xlarge
@@ -431,6 +447,11 @@ Resources:
         - Key: EnvironmentStage
           Value: !Sub ${TagEnvironment}
       SecurityGroupIngress:
+        ## Allow ICMP
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCCIDR
         # Bastion HVR GUI to Hub Communication
         - IpProtocol: tcp
           FromPort: 4343
@@ -498,6 +519,11 @@ Resources:
         - Key: EnvironmentStage
           Value: !Sub ${TagEnvironment}
       SecurityGroupIngress:
+        ## Allow ICMP
+        - IpProtocol: icmp
+          FromPort: -1
+          ToPort: -1
+          CidrIp: !Ref VPCCIDR
         ## Hub/NLB Communication
         - IpProtocol: tcp
           FromPort: 4343

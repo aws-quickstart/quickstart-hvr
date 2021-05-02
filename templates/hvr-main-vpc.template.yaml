@@ -240,14 +240,14 @@ Parameters:
     Default: "dev"
 
   QSS3BucketRegion:
-    Default: "us-east-1"
+    Default: "ap-southeast-2"
     Description: "The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value."
     Type: String
 
   QSS3BucketName:
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
     ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Default: "quickstart-hvr"
+    Default: "ae-quickstart-aws-hvr"
     Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     Type: String
 
@@ -329,7 +329,7 @@ Resources:
               - !Ref "QSS3BucketRegion"
       Parameters:
         VPCID: !GetAtt VPCStack.Outputs.VPCID
-        VPCCIRD: !Ref VPCCIDR
+        VPCCIDR: !Ref VPCCIDR
         PublicSubnet1: !GetAtt VPCStack.Outputs.PublicSubnet1ID
         PublicSubnet2: !GetAtt VPCStack.Outputs.PublicSubnet2ID
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
@@ -359,6 +359,7 @@ Resources:
         VPCID: !GetAtt
           - VPCStack
           - Outputs.VPCID
+        VPCCIDR: !Ref VPCCIDR
         PrivateSubnet1CIDR: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet1ACIDR

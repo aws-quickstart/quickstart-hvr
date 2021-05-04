@@ -8,12 +8,15 @@ Description: >-
   This main template creates a VPC for deployment of HVR on AWS. 
   **WARNING**
   This template creates EC2 instances and related resources. You will be billed
-  for the AWS resources used if you create a stack from this template.
+  for the AWS resources used if you create a stack from this template.(qs-1roo3sq66)
 
 ######################################
 ## Stack Metadata
 ######################################
 Metadata:
+  QuickStartDocumentation:
+    EntrypointName: "Launch into a new VPC"
+    Order: 1
   AWS::CloudFormation::Interface:
     ParameterGroups:
       - Label:
@@ -237,14 +240,14 @@ Parameters:
     Default: "dev"
 
   QSS3BucketRegion:
-    Default: "us-east-1"
+    Default: "ap-southeast-2"
     Description: "The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value."
     Type: String
 
   QSS3BucketName:
     AllowedPattern: "^[0-9a-zA-Z]+([0-9a-zA-Z-]*[0-9a-zA-Z])*$"
     ConstraintDescription: "Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
-    Default: "quickstart-hvr"
+    Default: "ae-quickstart-aws-hvr"
     Description: "The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-)."
     Type: String
 
@@ -356,6 +359,7 @@ Resources:
         VPCID: !GetAtt
           - VPCStack
           - Outputs.VPCID
+        VPCCIDR: !Ref VPCCIDR
         PrivateSubnet1CIDR: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet1ACIDR

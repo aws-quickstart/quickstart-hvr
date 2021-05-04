@@ -296,6 +296,7 @@ Resources:
           Description: Allow outbound HTTPS 
 
 
+
   ## ------------------------------------------------------------ #
   ## Create the Auto Scaling Group for the HVR Bastion Host
   ##  - 1 EC2 Instance running at a time

@@ -30,8 +30,6 @@ Metadata:
           - VPCCIDR
           - PrivateSubnet1
           - PrivateSubnet2
-          - PublicSubnet1CIDR
-          - PublicSubnet2CIDR
           - PrivateSubnet1CIDR
           - PrivateSubnet2CIDR
       - Label:
@@ -49,6 +47,8 @@ Metadata:
         Parameters:
           - HVRPubKeyBase64
           - HVRPrivKeyBase64
+      - Label:
+          default: Secrets Manager ARN for HVR License Key secret
 
     ParameterLabels:
       AcceptedEULA:
@@ -61,10 +61,6 @@ Metadata:
         default: Private subnet 1 ID
       PrivateSubnet2:
         default: Private subnet 2 ID
-      PublicSubnet1CIDR:
-        default: Public Subnet 1 (AZ1) CIDR Range
-      PublicSubnet2CIDR:
-        default: Public Subnet 2 (AZ2) CIDR Range
       PrivateSubnet1CIDR:
         default: Private Subnet 1 (AZ1) CIDR Range
       PrivateSubnet2CIDR:
@@ -81,6 +77,8 @@ Metadata:
         default: HVR Public Key (base64)
       HVRPrivKeyBase64:
         default: HVR Private Key (base64)
+      HVRLicenseSecret:
+        default: HVR License Key (Secret ARN)
 
   License: Apache-2.0
 
@@ -117,16 +115,6 @@ Parameters:
   PrivateSubnet2:
     Description: "An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database)."
     Type: AWS::EC2::Subnet::Id
-
-  PublicSubnet1CIDR:
-    Description: VPC Stack Shared CIDR block for the public subnet 1 located in Availability Zone 1
-    Type: String
-    NoEcho: true
-
-  PublicSubnet2CIDR:
-    Description: VPC Stack Shared CIDR block for the public subnet 2 located in Availability Zone 2
-    Type: String
-    NoEcho: true
 
   PrivateSubnet1CIDR:
     Description: VPC Stack Shared CIDR block for the private subnet 1 located in Availability Zone 1
@@ -264,6 +252,15 @@ Parameters:
       bDNHYms2N3RzT0l2LwotLS0tLUVORCBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLQo=
 
 
+  HVRLicenseSecret:
+    Description: |
+      Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.      
+      If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
+      If you require a license please contact the HVR Software sales team and leave the value as "none".
+    Type: String
+    Default: "none"
+
+
 ######################################
 ## Condition definitions 
 ######################################
@@ -272,6 +269,9 @@ Conditions:
     - !Ref AcceptedEULA
     - "yes"
 
+  NoHVRLicenseProvided: !Equals
+    - !Ref HVRLicenseSecret
+    - "none"
 
 ######################################
 ## Mapping definitions 
@@ -330,6 +330,19 @@ Mappings:
 ## Declaration of stack resources
 ######################################
 Resources:
+
+  ## ------------------------------------------------------------ #
+  ## Create Secrets Manager Secret to hold the HVR License Key
+  ## ------------------------------------------------------------ #
+  HVRLicKey:
+    Condition: NoHVRLicenseProvided
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/hvrlic
+      Description: HVR Quickstart License Key
+      Tags:
+        - Key: Name
+          Value: HVRLicenseSecret
 
   ## ------------------------------------------------------------ #
   ## Create Secrets Manager Secret to hold the HVR Unix User Password
@@ -456,35 +469,14 @@ Resources:
         - IpProtocol: tcp
           FromPort: 4343
           ToPort: 4343
-          CidrIp: !Ref PublicSubnet1CIDR
-          Description: Allow HVR Port 4343 on Public Subnet1 
-        - IpProtocol: tcp
-          FromPort: 4343
-          ToPort: 4343
-          CidrIp: !Ref PublicSubnet2CIDR
-          Description: Allow HVR Port 4343 on Public Subnet1 
+          CidrIp: !Ref VPCCIDR
+          Description: Allow HVR Port 4343 from within VPC 
         ## Bastion SSH to Hub
         - IpProtocol: tcp
           FromPort: 22
           ToPort: 22
-          CidrIp: !Ref PublicSubnet1CIDR
-          Description: Allow SSH in Public Subnet1 
-        - IpProtocol: tcp
-          FromPort: 22
-          ToPort: 22
-          CidrIp: !Ref PublicSubnet2CIDR
-          Description: Allow SSH in Public Subnet2
-        ## HVR Agent Communication
-        - IpProtocol: tcp
-          FromPort: 4343
-          ToPort: 4343
-          CidrIp: !Ref PrivateSubnet1CIDR
-          Description: Allow HVR Port 4343 on private Subnet1 
-        - IpProtocol: tcp
-          FromPort: 4343
-          ToPort: 4343
-          CidrIp: !Ref PrivateSubnet2CIDR
-          Description: Allow HVR Port 4343 on private Subnet2 
+          CidrIp: !Ref VPCCIDR
+          Description: Allow SSH from within VPC
         ## EFS
         - IpProtocol: tcp
           FromPort: 2049
@@ -719,6 +711,11 @@ Resources:
             aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRPubKey} --query 'SecretString' --output text | base64 -d > /opt/hvr/hvr_home/lib/cert/hvrqs.pub_cert
             HVRUSERPWD=`aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRUnixUserPassword} --query 'SecretString' --output text`
 
+            if [ "$HVRLicenseSecret" = "none" ]; then
+                aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRLicKey} --query 'SecretString' --output text | base64 -d > /opt/hvr/hvr_home/lib/hvr.lic
+            else
+                aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRLicenseSecret} --query 'SecretString' --output text | base64 -d > /opt/hvr/hvr_home/lib/hvr.lic
+            fi
 
             ## set hvr user password, we use pub/priv cert and password together for hvr authentication
             echo "hvr:$HVRUSERPWD" | chpasswd
@@ -1055,6 +1052,11 @@ Resources:
                   - !Ref HVRPrivKey
                   - !Ref HVRPubKey
                   - !Ref HVRUnixUserPassword
+                  - !If 
+                      - NoHVRLicenseProvided
+                      - 
+                        !Ref HVRLicKey 
+                      - !Ref HVRLicenseSecret
                 Sid: SSMPermissions
           PolicyName: !Sub hvr-role-policy-${TagEnvironment}
 

@@ -44,6 +44,10 @@ Metadata:
         Parameters:
           - TagEnvironment
       - Label:
+          default: HVR License Key (Secret Parameter ARN)
+        Parameters:
+          - HVRLicenseSecret
+      - Label:
           default: HVR Aurora/PostgreSQL configuration
         Parameters:
           - EnablePGStack
@@ -96,6 +100,8 @@ Metadata:
         default: Quick Start S3 bucket name
       QSS3KeyPrefix:
         default: Quick Start S3 Key prefix
+      HVRLicenseSecret:
+        default: HVR License Key (Secret ARN)
 
   License: Apache-2.0
 
@@ -258,6 +264,14 @@ Parameters:
     Description: "The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/)."
     Type: String
 
+  HVRLicenseSecret:
+    Description: |
+      Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.      
+      If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
+      If you require a license please contact the HVR Software sales team and leave the value as "none".
+    Type: String
+    Default: "none"
+
 
 ######################################
 ## Condition definitions 
@@ -329,7 +343,7 @@ Resources:
               - !Ref "QSS3BucketRegion"
       Parameters:
         VPCID: !GetAtt VPCStack.Outputs.VPCID
-        VPCCIRD: !Ref VPCCIDR
+        VPCCIDR: !Ref VPCCIDR
         PublicSubnet1: !GetAtt VPCStack.Outputs.PublicSubnet1ID
         PublicSubnet2: !GetAtt VPCStack.Outputs.PublicSubnet2ID
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
@@ -366,12 +380,6 @@ Resources:
         PrivateSubnet2CIDR: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet2ACIDR
-        PublicSubnet1CIDR: !GetAtt
-          - VPCStack
-          - Outputs.PublicSubnet1CIDR
-        PublicSubnet2CIDR: !GetAtt
-          - VPCStack
-          - Outputs.PublicSubnet2CIDR
         PrivateSubnet1: !GetAtt
           - VPCStack
           - Outputs.PrivateSubnet1AID
@@ -382,6 +390,7 @@ Resources:
         HVRInstanceTypeAgent: !Ref HVRInstanceTypeAgent
         KeyName: !Ref KeyName
         TagEnvironment: !Ref TagEnvironment
+        HVRLicenseSecret: !Ref HVRLicenseSecret
   
 
   ## ------------------------------------------------------------ #

@@ -240,8 +240,6 @@ Parameters:
     AllowedValues:
       - dev
       - test
-      - qa
-      - prod
     Description: Designates the environment stage of the associated AWS resource.
     Default: "dev"
 
@@ -349,6 +347,7 @@ Resources:
         RemoteAccessCIDR: !Ref RemoteAccessCIDR
         KeyName: !Ref KeyName
         TagEnvironment: !Ref TagEnvironment
+        HVRPubKeyBase64: !GetAtt HVRStack.Outputs.HVRPublicKey
   
 
   ## ------------------------------------------------------------ #

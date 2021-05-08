@@ -41,6 +41,10 @@ Metadata:
           default: Tag identifiers
         Parameters:
           - TagEnvironment
+      - Label:
+          default: Public key for HVR communication
+        Parameters:
+          - HVRPubKeyBase64
 
     ParameterLabels:
       AcceptedEULA:
@@ -61,6 +65,8 @@ Metadata:
         default: Key pair name
       TagEnvironment:
         default: Environment Tag 
+      HVRPubKeyBase64:
+        default: HVR Public Key (base64)
 
   License: Apache-2.0
 
@@ -130,6 +136,38 @@ Parameters:
     Description: Name of an existing EC2 KeyPair to enable SSH access to the instance
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
+
+  # The HVR Public key to allow secure communication. This is set as a parameter, and will be obtained from the HVR Stack output
+  # The HVRPubKeyBase64 value must be a Base64 encoded public key - see the HVRStack
+  HVRPubKeyBase64:
+    Description: |
+      Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication with the HVR Hub
+      The default location is /opt/hvr/hvr_home/lib/cert and the file name used in this example is qshvr.pub_cert.
+      A method to get this string from your public certificate, is using the base64 utility, example: "cat qshvr.pub_cert \| base64"
+      The Quickstart does provide a sample default set of private/public keys (see hvrhub stack template) - this should be changed for production systems.  
+    Type: String
+    NoEcho: true
+    Default: |
+      LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM5RENDQWR5Z0F3SUJBd0lCQURBTkJna3Fo
+      a2lHOXcwQkFRc0ZBREFvTVFzd0NRWURWUVFHRXdKT1RERVoKTUJjR0ExVUVBd3dRU0ZaU0lFVjRZ
+      VzF3YkdVZ1MyVjVjekFlRncweU1ERXlNekV3TURVek1qSmFGdzAwTURFeQpNall3TURVek1qSmFN
+      Q2d4Q3pBSkJnTlZCQVlUQWs1TU1Sa3dGd1lEVlFRRERCQklWbElnUlhoaGJYQnNaU0JMClpYbHpN
+      SUlCSURBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVEwQU1JSUJDQUtDQVFFQXB4Q1hVUFN6cUJlVys5
+      ZFoKbkFTNndQRXJPWVZSYkxhRStleTZUTW84bWUzTldzY044aW1TQktjYnViVFA2ajFUNEd1VzhS
+      QVlaK3pJZGh4TQpRZmswYzRqMUR0NElPRll5UURIOFdHLzlxU3Rmc1psNjJOV2FwNXhDNWxFU0Mx
+      MmQ1dkRqOUp3LzRlV29oU3J4CnBsY3EveVh6SWNoVWdyaWkxbExKSlFEMHUyTWxDQmN3ZjVVQkIv
+      ZWFHa1U4SGZLMHU3MHhWcmtOYnJqYTRweSsKZFNJOS85VnFMWnpRNWZ1aGNhb1Q0WU9WbGpaUUpq
+      UTN1clpaTVVtUnRybWl1SEVpdGtqa3NTeXNkZDdaODI1LwpoNWI3bkMzdlJ0VTExVnk3N3VtT0FB
+      d2htbXJ3bitXb2JqZ0ZyenlvYWVwOVphV1dZY09mMTFKYUlnYk1WdUY1CklKTEUxd0lCQTZNck1D
+      a3dKd1lKWUlaSUFZYjRRZ0VOQkJvV0dFZGxibVZ5WVhSbFpDQmllU0JJVmxJZ05TNDMKTGpBdk9E
+      QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFhckVVYjNxeUcya0dYM1VMNXJHSlo3eW1kTktUMTls
+      eQpLWnBLeWVCMjcvU1hPWVg3RDBITWNESlhlSk9vaGkvcmRBdGR2dXBiU3ZLK1dqSVR6amlSZ0Nw
+      em05ZmNyTlFyCi81RzdONVdKSDJOK3I4cStuZGNaVnhZTytBaHA0djBkVXdDcGlUeVI1dUhWZ1g1
+      VlpWSyttSFZjTllxalgxaG4KTUVqeW1yUVRwUHdWeEpSY2FKaE9peC9wcThadStmZzRqQ3FrNC9D
+      OTQzMjVPQnZ0ZEhXMkZ6UGZ4TERPM1pUSgpmVE5pTnV0VEM1MDMxZEc0SEJGWGtWdnAxenk3bDRx
+      U2ZVWG1YR0dSMkNETlhYaDVHeVJpWlpFQUlpSHBoR21LClMyUHZlREJPN1B1RDdCcWpqK1BkcE5x
+      UFdzVTN5M3dabHZhcjBkT3NKYWZXSmlYb2x0ay9wZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0t
+      LS0K
 
 
 ######################################
@@ -365,6 +403,10 @@ Resources:
 
             systemctl stop hvr.socket
             systemctl disable hvr.socket
+
+            echo "${HVRPubKeyBase64}" | sed 's/\ //g' | base64 -d > /opt/hvr/hvr_home/lib/cert/hvrqs.pub_cert
+            chown hvr:hvr /opt/hvr/hvr_home/lib/cert/hvrqs.*
+            chmod 600 /opt/hvr/hvr_home/lib/cert/hvrqs.*
 
             function cfn_fail
             {

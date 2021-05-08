@@ -404,7 +404,7 @@ Resources:
             systemctl stop hvr.socket
             systemctl disable hvr.socket
 
-            echo ${HVRPubKeyBase64} | base64 -d > /opt/hvr/hvr_home/lib/cert/hvrqs.pub_cert
+            echo "${HVRPubKeyBase64}" | sed 's/\ //g' | base64 -d > /opt/hvr/hvr_home/lib/cert/hvrqs.pub_cert
             chown hvr:hvr /opt/hvr/hvr_home/lib/cert/hvrqs.*
             chmod 600 /opt/hvr/hvr_home/lib/cert/hvrqs.*
 

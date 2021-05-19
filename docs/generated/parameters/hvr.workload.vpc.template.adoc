@@ -9,7 +9,8 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|VPCID ID
-(`VPCID`)|`**__Requires input__**`|The ID of the existing VPC that contains the subnets.|Private subnet 1 ID
+(`VPCID`)|`**__Requires input__**`|The ID of the existing VPC that contains the subnets.|CIDR Block for the VPC
+(`VPCCIDR`)|`10.0.0.0/16`|CIDR block for the VPC|Private subnet 1 ID
 (`PrivateSubnet1`)|`**__Requires input__**`|An existing private subnet 1 to launch secondary resources (e.g. PostgresSQL database).|Private subnet 2 ID
 (`PrivateSubnet2`)|`**__Requires input__**`|An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database).|Public Subnet 1 (AZ1) CIDR Range
 (`PublicSubnet1CIDR`)|`**__Requires input__**`|VPC Stack Shared CIDR block for the public subnet 1 located in Availability Zone 1|Public Subnet 2 (AZ2) CIDR Range
@@ -21,8 +22,8 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|HVR EC2 instance type for HVR HUB
-(`HVRInstanceTypeHUB`)|`c4.large`|General Purpose EC2 instance - Recommended for HUB only Instances|HVR EC2 instance type for HVR Agent
-(`HVRInstanceTypeAgent`)|`c4.large`|Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate|Key pair name
+(`HVRInstanceTypeHUB`)|`c5.large`|General Purpose EC2 instance - Recommended for HUB only Instances|HVR EC2 instance type for HVR Agent
+(`HVRInstanceTypeAgent`)|`c5.large`|Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate|Key pair name
 (`KeyName`)|`**__Requires input__**`|Name of an existing EC2 KeyPair to enable SSH access to the instance
 |===
 .Tag identifiers

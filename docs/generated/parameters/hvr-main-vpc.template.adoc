@@ -21,8 +21,8 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|HVR EC2 instance type for HVR HUB
-(`HVRInstanceTypeHUB`)|`c4.large`|EC2 instance type - for HVR HUB|HVR EC2 instance type for HVR Agent
-(`HVRInstanceTypeAgent`)|`c4.large`|EC2 instance type - for HVR Agent running Capture/Integrate|Key pair name
+(`HVRInstanceTypeHUB`)|`c5.large`|EC2 instance type - for HVR HUB|HVR EC2 instance type for HVR Agent
+(`HVRInstanceTypeAgent`)|`c5.large`|EC2 instance type - for HVR Agent running Capture/Integrate|Key pair name
 (`KeyName`)|`**__Requires input__**`|Name of an existing EC2 KeyPair to enable SSH access to the instance
 |===
 .Tag identifiers
@@ -30,6 +30,15 @@
 |===
 |Parameter label (name) |Default value|Description|Environment Tag
 (`TagEnvironment`)|`dev`|Designates the environment stage of the associated AWS resource.
+|===
+.HVR License Key (Secret Parameter ARN)
+[width="100%",cols="16%,11%,73%",options="header",]
+|===
+|Parameter label (name) |Default value|Description|HVR License Key (Secret ARN)
+(`HVRLicenseSecret`)|`none`|Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.      
+If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
+If you require a license please contact the HVR Software sales team and leave the value as "none".
+
 |===
 .HVR Aurora/PostgreSQL configuration
 [width="100%",cols="16%,11%,73%",options="header",]
@@ -44,7 +53,7 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|S3 Region for S3 Bucket
-(`QSS3BucketRegion`)|`us-east-1`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 bucket name
-(`QSS3BucketName`)|`quickstart-hvr`|The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 Key prefix
+(`QSS3BucketRegion`)|`ap-southeast-2`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 bucket name
+(`QSS3BucketName`)|`ae-quickstart-aws-hvr`|The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 Key prefix
 (`QSS3KeyPrefix`)|`quickstart-hvr/`|The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
 |===

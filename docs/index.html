@@ -1714,13 +1714,13 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR HUB
 (<code>HVRInstanceTypeHUB</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c4.large</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type - for HVR HUB</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR Agent
 (<code>HVRInstanceTypeAgent</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c4.large</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type - for HVR Agent running Capture/Integrate</p></td>
 </tr>
 <tr>
@@ -1755,7 +1755,32 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. HVR Aurora/PostgreSQL configuration</caption>
+<caption class="title">Table 5. HVR License Key (Secret Parameter ARN)</caption>
+<colgroup>
+<col style="width: 16%;">
+<col style="width: 11%;">
+<col style="width: 73%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Parameter label (name)</th>
+<th class="tableblock halign-left valign-top">Default value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">HVR License Key (Secret ARN)
+(<code>HVRLicenseSecret</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
+If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
+If you require a license please contact the HVR Software sales team and leave the value as "none".</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 6. HVR Aurora/PostgreSQL configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1796,7 +1821,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 6. AWS Quick Start configuration S3 Bucket/Prefix</caption>
+<caption class="title">Table 7. AWS Quick Start configuration S3 Bucket/Prefix</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1813,13 +1838,13 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">S3 Region for S3 Bucket
 (<code>QSS3BucketRegion</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>us-east-1</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ap-southeast-2</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket name
 (<code>QSS3BucketName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-hvr</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>ae-quickstart-aws-hvr</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
 </tr>
 <tr>
@@ -1834,7 +1859,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <div class="sect2">
 <h3 id="_launch_into_an_existing_vpc">Launch into an existing VPC</h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 7. End User License Agreement (EULA) - HVR CDC</caption>
+<caption class="title">Table 8. End User License Agreement (EULA) - HVR CDC</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1857,7 +1882,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 8. VPC network configuration</caption>
+<caption class="title">Table 9. VPC network configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1876,6 +1901,12 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 (<code>VPCID</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the existing VPC that contains the subnets.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the VPC
+(<code>VPCCIDR</code>)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/16</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 1 ID
@@ -1916,7 +1947,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. HVR EC2 Configuration</caption>
+<caption class="title">Table 10. HVR EC2 Configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1933,13 +1964,13 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR HUB
 (<code>HVRInstanceTypeHUB</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c4.large</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">General Purpose EC2 instance - Recommended for HUB only Instances</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR Agent
 (<code>HVRInstanceTypeAgent</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c4.large</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate</p></td>
 </tr>
 <tr>
@@ -1951,7 +1982,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. Tag identifiers</caption>
+<caption class="title">Table 11. Tag identifiers</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1974,7 +2005,7 @@ Region</code>, and <code>Quick Start S3 key prefix</code>. Changing these parame
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 11. Public and Private keys for HVR communication</caption>
+<caption class="title">Table 12. Public and Private keys for HVR communication</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">

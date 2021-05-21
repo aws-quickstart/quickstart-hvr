@@ -4,13 +4,9 @@
 
 This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
 
-HVR’s real-time data replication technology enables organizations to plan, predict, and respond with the freshest data available.  With HVR, you can easily move high volumes of data efficiently and securely with little to no latency. Log-based Change Data Capture (CDC) and compression features allow for fast, efficient and cost-effective data movement. 
-The set-up is simple with a graphical user interface (GUI). Encryption capabilities keep your in-flight data secure. +
+HVR’s real-time data replication technology enables organizations to plan, predict, and respond with the freshest data available.  Log-based Change Data Capture (CDC) and compression features allow for fast, efficient and cost-effective data movement. Example, if you are looking at replicating data real-time between various database enviornments such as Oracle to Postgresql, then this is an excellent option for you to get started.  Other use cases also include moving data real-time from various source enviornments into AWS Redshift or even Snowflake.  For more detail on the various source and target configuration options supported by HVR, please see the HVR online documentation.
 
-Highlights of the HVR Software features include:
+The HVR software does provide a plathora of options and with this Quick Start, you can hit the ground running with a number of the components installed and ready for you to use and customize to your needs.  
 
-*  Seamless delivery onto multiple AWS and other targets simultaneously (such as S3, RDS, Redshift, Aurora, Snowflake)
-*  Integrate from multiple databases on-prem or in the cloud, commonly used on-prem technologies and AWS services are supported
-*  Performance and scalability: log-based change data capture and compressed data transfer enable high speed and low latency
+In summary the quick start will create an HVR Hub and repository database (using AWS RDS Aurora for Postgresql), as well as n HVR Agent configuration.  The HVR components will be deployed in a new VPC within a private subnet accross two availability zones - selected by you during deployment. You do have the option to not create the repository database in case you already have an existing database you might want to use.  The repository database does not have to be Postgresql, and a number of other databases are supported including Oracle.  For the HVR Hub and Agent instances, the HVR BYOL Marketplace Image is used which is already pre-installed with the HVR software ready for you to start using with your existing license.  
 
-This Quick Start helps you create an HVR Hub and repository as well as an HVR Agent configuration in a new VPC within your AWS account.  The HVR BYOL Marketplace Image is used which is already pre-installed with the HVR software ready for you to start using with your existing license.  

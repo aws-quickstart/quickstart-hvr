@@ -45,6 +45,7 @@ In summary all components created include:
 * HVR Agent Instances (2) - based on HVR BYOL Marketplace Image.
 * Network Load Balancers.
 * Secrets Manager - Used for Database and OS User Passwords.
+* Secrets Manager - A secret with the HVR License information should be greated and the details supplied on execution of the quickstart to allow the HVR Components to access and use the license details.
 * Secrets Manager - Used for the HVR Public/Private certificates for secure communication.  Sample certificates are provided as part of the templates.
 * Aurora Postgresql - Database used as HVR Hub Repository.
 

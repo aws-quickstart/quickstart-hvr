@@ -4,6 +4,8 @@ This Quick Start requires a license for {partner-product-short-name}.
 
 To obtain a license if you do not already have one, please contact the HVR team using info@hvr-software.com or via the HVR Software website https://www.hvr-software.com. 
 
+A Secrets Manager Secret should be created prior to deploying this stack.  This secret should be a plain text secret holding the full HVR License Key text.  During the deployment you will be asked to provide the ARN for this secret - located in Secrets Manager.  If no value is provided an new Secret with emtpy value will be created.  Once you have then obtained a valid license, you can update this secret with the value.
+
 Note: This Quickstart will make use of the HVR Bring Your Own License (BYOL) AMI which can be found on the https://aws.amazon.com/marketplace/pp/B077YM8HPW[AWS Marketplace^]
 
 // Or, if the deployment uses an AMI, update this paragraph. If it doesn’t, remove the paragraph.

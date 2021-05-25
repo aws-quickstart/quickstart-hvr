@@ -2,16 +2,19 @@
 
 ==== Prepare your AWS account
 
-The template will create a new VPC with a public and private subnet across two Availability Zones.  A bastion host will be created in the public subnet which will allow you to run the HVR GUI for configuring the HVR software components (HVR Hub and Agent) in the private subnet.  
+The template will create a new VPC with a public and private subnet across two Availability Zones. A bastion host will be created in the public subnet which will allow you to run the HVR GUI for configuring the HVR software components (HVR Hub and Agent) in the private subnet.
 
-In preperation you will need to make sure you deploy the HVR configuration in a region close to your source and destination into which you want to load data.  
+In preparation you will need to make sure you deploy the HVR configuration in a region close to your source from and/or destination into which you want to load data.
 
-This Quick Start deployment templates will make use of the HVR BYOL Marketplace AMI image.  You will be required to load your license onto the HVR Hub system once the environment is deployed, if you do not have a valid license please contact the HVR team using info@hvr-software.com.
+This Quick Start deployment templates makes use of the HVR BYOL Marketplace AMI image. A Valid license key is required and as part of the deployment you will be asked for the AWS Secrets Manager Secret ARN which holds the license text. If you do not have a valid license please contact the HVR team using info@hvr-software.com. Note that if you do not supply a license file and continue with a deployment, an empty Secrets Manager secret will be created and used. When you obtain your license please update this secret with the license details.
+To ensure High Availability for the HVR Hub configuration an EFS filesystem will be created as part of the quickstart deployment. This EFS filesystem will be mounted into the EC2 instance running as the HVR Hub.
 
-To ensure High Availability for the HVR Hub configuration an EFS filesystem will be created as part of the quickstart deployment.  This EFS filesystem will be mounted into the EC2 instance running as the HVR Hub.  
+In addition to the above an Aurora PostgreSQL database will be created. This is optional, as you might already have a database available for use as the HVR Hub Database. Note the repository Database schema  should NOT be the same database schema you are using as a source or destination for your data replication.
 
-In addition to the above an Aurora Postgresql database will be created.  This is optional, as you might already have a database available for use as the HVR Hub Database.  Note this should NOT be the same database you are using as a source or destination for your data replication.
 
 ==== Prepare for the deployment
 
-To ensure secure communication between the HVR components (HVR Hub and Agents) a pair of public and private certificates is used.  The template will provide a default set of keys which can be used, however we do recommend that these are only used for evalution and that you generate your own keys and use them - see the parameter section for HVRPubKeyBase64 and HVRPrivKeyBase64 parameters.  These keys can be created using either openssl or using the HVR hvrsslgen utility.  For more detail please see the HVR online https://www.hvr-software.com/docs/5[documentation^].
+To ensure secure communication between the HVR components (HVR Hub and Agents) a pair of public and private certificates is used. The template will provide a default set of keys which can be used. However, we recommend that these are only used for evaluation and that you generate your own keys - see the parameter section for HVRPubKeyBase64 and HVRPrivKeyBase64 parameters. These keys can be created using either openssl or using the HVR hvrsslgen utility. For more details, please see the HVR online https://www.hvr-software.com/docs/5[documentation^].
+
+A Secrets Manager Secret should be created prior to deploying this stack. This secret should be a text secret holding the full HVR License Key text. During the deployment you will be asked to provide the ARN for this secret.
+

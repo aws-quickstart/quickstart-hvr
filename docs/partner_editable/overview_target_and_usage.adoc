@@ -2,15 +2,18 @@
 // Identify your target audience and explain how/why they would use this Quick Start.
 //Avoid borrowing text from third-party websites (copying text from AWS service documentation is fine). Also, avoid marketing-speak, focusing instead on the technical aspect.
 
-This guide provides instructions for deploying the {partner-product-short-name} Quick Start reference architecture on the AWS Cloud.
+This guide provides instructions for deploying the HVR Quick Start reference architecture on the AWS Cloud.
+HVR’s real-time data replication technology replicates data between transactional databases as well as file systems in heterogeneous configurations. For optimum efficiency HVR is deployed in a distributed setup. Such deployment consists of installations of the HVR technology that act as agents, close to replication end points, and an installation that acts as the hub to control all replication flows. 
 
-HVR’s real-time data replication technology enables organizations to plan, predict, and respond with the freshest data available.  With HVR, you can easily move high volumes of data efficiently and securely with little to no latency. Log-based Change Data Capture (CDC) and compression features allow for fast, efficient and cost-effective data movement. 
-The set-up is simple with a graphical user interface (GUI). Encryption capabilities keep your in-flight data secure. +
+At a high level the distributed setup provides the following benefits:
 
-Highlights of the HVR Software features include:
+*  Performance, with local access to data and compressed, optimized communication.
+*  Scalability, distributing resource-intensive processing, and allowing for many replication flows managed through a single control environment.
+*  Security, enabling encrypted communication and the use of a proxy to avoid having to open up a firewall directly into a production database. 
 
-*  Seamless delivery onto multiple AWS and other targets simultaneously (such as S3, RDS, Redshift, Aurora, Snowflake)
-*  Integrate from multiple databases on-prem or in the cloud, commonly used on-prem technologies and AWS services are supported
-*  Performance and scalability: log-based change data capture and compressed data transfer enable high speed and low latency
+For example, if you are looking at replicating data in real-time between various database environments such as Oracle to PostgreSQL, then this Quick Start is an excellent option for you to get started. Other use cases also include moving data in near real-time from various source environments into AWS Redshift or even Snowflake. For more details on the various source and target configuration options supported by HVR, please see the HVR online documentation, or HVR’s website at https://www.hvr-software.com.
+This Quick Start helps you get started with an initial deployment following HVR’s recommended best practice of a distributed setup, enabling high availability out-of-the-box. With many options to customize the deployment, this Quick Start installs multiple  components that are  ready for you to use.
 
-This Quick Start helps you create an HVR Hub and repository as well as an HVR Agent configuration in a new VPC within your AWS account.  The HVR BYOL Marketplace Image is used which is already pre-installed with the HVR software ready for you to start using with your existing license.  
+At a high level the quick start will create an HVR Hub and repository database (using AWS RDS Aurora for PostgreSQL), as well as an HVR Agent configuration. The HVR components will be deployed in a new VPC within a private subnet across two availability zones - selected by you during deployment. You may choose to not create the repository database in case you already have an existing database you prefer to use. The repository database does not have to be PostgreSQL, and a number of other databases are supported including MySQL, MariaDB, SQL Server and Oracle. For the HVR Hub and Agent instances, the HVR BYOL Marketplace Image is used which has already pre-installed the HVR software and database drivers ready for you to start using with your existing license.
+
+

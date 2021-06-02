@@ -49,6 +49,8 @@ Metadata:
           - HVRPrivKeyBase64
       - Label:
           default: Secrets Manager ARN for HVR License Key secret
+        Parameters:
+          - HVRLicenseSecret
 
     ParameterLabels:
       AcceptedEULA:

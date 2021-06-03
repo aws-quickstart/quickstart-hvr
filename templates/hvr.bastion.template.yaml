@@ -2,16 +2,16 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 ######################################
-## Stack Description  
+## Stack Description
 ######################################
 Description: >-
-  This template creates an HVR Bastion host environment in a specified VPC public subnet. 
+  This template creates an HVR Bastion host environment in a specified VPC public subnet.
   The Bastion Host is based on the HVR 5.7 BYOL Marketplace Image.  This will
-  allow you to open the HVR GUI from the Bastion Host - connecting to the HVR HUB 
+  allow you to open the HVR GUI from the Bastion Host - connecting to the HVR HUB
   in the private subnet.
-  
+
   **WARNING**
-  This template creates EC2 instance a Network Load Balancer and related resources. 
+  This template creates EC2 instance a Network Load Balancer and related resources.
   You will be billed for the AWS resources used if you create a stack from this template.(qs-1roo3sq6e)
 
 ######################################
@@ -64,7 +64,7 @@ Metadata:
       KeyName:
         default: Key pair name
       TagEnvironment:
-        default: Environment Tag 
+        default: Environment Tag
       HVRPubKeyBase64:
         default: HVR Public Key (base64)
 
@@ -105,7 +105,7 @@ Parameters:
     Description: Select the second public subnet in a second availibility zone in your selected VPC.  HVR will run here in the event of a failure in the first AZ.
 
   HVRInstanceTypeBastion:
-    Description: General Purpose EC2 instance 
+    Description: General Purpose EC2 instance
     Type: String
     Default: t3.medium
     AllowedValues:
@@ -144,7 +144,7 @@ Parameters:
       Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication with the HVR Hub
       The default location is /opt/hvr/hvr_home/lib/cert and the file name used in this example is qshvr.pub_cert.
       A method to get this string from your public certificate, is using the base64 utility, example: "cat qshvr.pub_cert \| base64"
-      The Quickstart does provide a sample default set of private/public keys (see hvrhub stack template) - this should be changed for production systems.  
+      The Quickstart does provide a sample default set of private/public keys (see hvrhub stack template) - this should be changed for production systems.
     Type: String
     NoEcho: true
     Default: |
@@ -171,7 +171,7 @@ Parameters:
 
 
 ######################################
-## Condition definitions 
+## Condition definitions
 ######################################
 Conditions:
   IsAcceptedEULA: !Equals
@@ -180,7 +180,7 @@ Conditions:
 
 
 ######################################
-## Mapping definitions 
+## Mapping definitions
 ######################################
 Mappings:
   RegionMap:
@@ -256,10 +256,10 @@ Resources:
         Statement:
           - Sid: "AWSLogDeliveryWrite"
             Effect: Allow
-            Principal: 
+            Principal:
               Service: "delivery.logs.amazonaws.com"
             Action: 's3:PutObject'
-            Resource: !Join 
+            Resource: !Join
               - ''
               - - 'arn:aws:s3:::'
                 - !Ref NLBAccessLogsBucket
@@ -268,10 +268,10 @@ Resources:
                 - /*
           - Sid: "AWSLogDeliveryAclCheck"
             Effect: Allow
-            Principal: 
+            Principal:
               Service: "delivery.logs.amazonaws.com"
             Action: 's3:GetBucketAcl'
-            Resource: !Join 
+            Resource: !Join
               - ''
               - - 'arn:aws:s3:::'
                 - !Ref NLBAccessLogsBucket
@@ -301,7 +301,7 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: !Ref RemoteAccessCIDR
-          Description: Allow SSH 
+          Description: Allow SSH
         ## Allow Webdesktop
         - IpProtocol: tcp
           FromPort: 8080
@@ -336,7 +336,7 @@ Resources:
           FromPort: 443
           ToPort: 443
           CidrIp: 0.0.0.0/0
-          Description: Allow outbound HTTPS 
+          Description: Allow outbound HTTPS
 
 
 
@@ -397,7 +397,7 @@ Resources:
         SecurityGroupIds:
           - !Ref HVRSecurityGroupBastion
         InstanceType: !Ref HVRInstanceTypeBastion
-        UserData: 
+        UserData:
           Fn::Base64: !Sub |
             #!/bin/bash -x
 
@@ -418,9 +418,9 @@ Resources:
             {
               /opt/aws/bin/cfn-signal -e 0 --stack ${AWS::StackName} --region ${AWS::Region} --resource HvrBastionAutoScalingGroup
               exit 0
-            }       
+            }
 
-            # just run cfn-signal 
+            # just run cfn-signal
             cfn_success || cfn_fail
 
 ## ------------------------------------------------------------ #
@@ -435,7 +435,7 @@ Resources:
         - Key: access_logs.s3.enabled
           Value: "true"
         - Key: access_logs.s3.bucket
-          Value: 
+          Value:
             !Ref NLBAccessLogsBucket
       Subnets:
         - Ref: PublicSubnet1

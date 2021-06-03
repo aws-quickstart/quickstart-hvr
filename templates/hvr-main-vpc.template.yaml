@@ -2,10 +2,10 @@
 AWSTemplateFormatVersion: 2010-09-09
 
 ######################################
-## Stack Description  
+## Stack Description
 ######################################
 Description: >-
-  This main template creates a VPC for deployment of HVR on AWS. 
+  This main template creates a VPC for deployment of HVR on AWS.
   **WARNING**
   This template creates EC2 instances and related resources. You will be billed
   for the AWS resources used if you create a stack from this template.(qs-1roo3sq66)
@@ -93,7 +93,7 @@ Metadata:
       PGInstanceClass:
         default: Aurora/PostgreSQL instance class
       TagEnvironment:
-        default: Environment Tag 
+        default: Environment Tag
       QSS3BucketRegion:
         default: S3 Region for S3 Bucket
       QSS3BucketName:
@@ -194,7 +194,7 @@ Parameters:
     Description: EC2 instance type - for HVR Agent running Capture/Integrate
     Type: String
     Default: c5.large
-    AllowedValues: 
+    AllowedValues:
       [
         c5.large,
         c5.xlarge,
@@ -264,7 +264,7 @@ Parameters:
 
   HVRLicenseSecret:
     Description: |
-      Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.      
+      Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
       If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
       If you require a license please contact the HVR Software sales team and leave the value as "none".
     Type: String
@@ -272,10 +272,10 @@ Parameters:
 
 
 ######################################
-## Condition definitions 
+## Condition definitions
 ######################################
 Conditions:
-  UsingDefaultBucket: !Equals 
+  UsingDefaultBucket: !Equals
     - !Ref QSS3BucketName
     -  "aws-quickstart"
 
@@ -324,7 +324,7 @@ Resources:
   ## Create nested stack for Bastion host (based on HVR BYOL system)
   ## - this allows SSH and HVR GUI access
   ## ------------------------------------------------------------ #
-  
+
   BastionStack:
     Condition: IsAcceptedEULA
     Type: 'AWS::CloudFormation::Stack'
@@ -348,7 +348,7 @@ Resources:
         KeyName: !Ref KeyName
         TagEnvironment: !Ref TagEnvironment
         HVRPubKeyBase64: !GetAtt HVRStack.Outputs.HVRPublicKey
-  
+
 
   ## ------------------------------------------------------------ #
   ## Create nested stack for HVR Hub and Agents
@@ -390,7 +390,7 @@ Resources:
         KeyName: !Ref KeyName
         TagEnvironment: !Ref TagEnvironment
         HVRLicenseSecret: !Ref HVRLicenseSecret
-  
+
 
   ## ------------------------------------------------------------ #
   ## Creat nexted stack for Aurora/Postgresql if required
@@ -464,9 +464,9 @@ Outputs:
   HVRBastionNLBDns:
     Condition: IsAcceptedEULA
     Description: HVR Bastion Host Access Point (Load Balancer DNS)
-    Value:  
+    Value:
       Fn::GetAtt:
-        - BastionStack       
+        - BastionStack
         - Outputs.HVRBastionNLBDns
 
   HVRPort:
@@ -474,21 +474,21 @@ Outputs:
     Description: Port of the HVR Hub and Agents (via Load Balancers)
     Value:
       Fn::GetAtt:
-        - HVRStack 
+        - HVRStack
         - Outputs.HVRPort
 
   HVRHubNLBDns:
     Condition: IsAcceptedEULA
     Description: HVR Hub Access Point (Load Balancer DNS)
-    Value:  
+    Value:
       Fn::GetAtt:
-        - HVRStack       
+        - HVRStack
         - Outputs.HVRHubNLBDns
 
   HVRAgentNLBDns:
     Condition: IsAcceptedEULA
     Description: HVR Agent Access Point (Load Balancer DNS)
-    Value: 
+    Value:
       Fn::GetAtt:
         - HVRStack
         - Outputs.HVRAgentNLBDns

@@ -35,7 +35,7 @@
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|HVR License Key (Secret ARN)
-(`HVRLicenseSecret`)|`none`|Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.      
+(`HVRLicenseSecret`)|`none`|Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
 If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
 If you require a license please contact the HVR Software sales team and leave the value as "none".
 

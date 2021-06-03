@@ -1,0 +1,36 @@
+repos:
+ -   repo: https://github.com/pre-commit/pre-commit-hooks
+     rev: v2.3.0
+     hooks:
+     -   id: mixed-line-ending
+     -   id: trailing-whitespace
+     -   id: flake8
+ -   repo: https://github.com/ambv/black
+     rev: 21.5b2
+     hooks:
+     - id: black
+       language_version: python3.8
+ -   repo: https://github.com/asottile/seed-isort-config
+     rev: v2.2.0
+     hooks:
+     -   id: seed-isort-config
+         args: [--exclude=templates/]
+ -   repo: https://github.com/pre-commit/mirrors-isort
+     rev: v5.8.0  # Use the revision sha / tag you want to point at
+     hooks:
+     -   id: isort
+         files: ^source/
+         types: [file, python]
+ -   repo: https://github.com/jumanjihouse/pre-commit-hooks
+     rev: 2.1.5
+     hooks:
+     - id: script-must-have-extension
+       name: QuickStart policy is to use .sh extension for shell scripts
+       files: >
+         (?x)^(
+              function/scource/*|
+              scripts/*
+         )$
+       types: [shell, executable]
+     - id: shellcheck
+       types: [shell, executable]

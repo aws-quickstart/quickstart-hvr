@@ -2,15 +2,14 @@
 // Briefly describe the software. Use consistent and clear branding.
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-Efficient Change Data Capture and near real-time replication between technologies in homogeneous or heterogeneous environments enables several use cases. The most common ones are:
+In keeping with HVR's recommended best practice for high availability, this Quick Start deploys HVR in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows. This architecture provides the following benefits:
 
-*  Analytics and reporting, building data lakes, data warehouses and consolidated reporting databases leveraging multiple AWS services.
-*  High availability, leveraging AWS regions to ensure data is available 24x7.
-*  Data migration, between on-premises environments and AWS, either leveraging the same technology or for a heterogeneous migration, with the ability to gradually migrate and have a fallback option.
+*  Performance: It provides local access to data and compressed, optimized communication.
+*  Scalability: It distributes resource-intensive processing so that you can manage many replication flows through a single control environment.
+*  Security: It uses encrypted communication and a proxy to avoid opening a firewall directly into a production database.
 
-HVR provides the complete set of features necessary to get your data replication project up and running from beginning to end: table creation and initial load, log-based CDC, data validation and repair, and monitoring.
+The HVR hub and agent instances use the HVR BYOL Marketplace image, which has the HVR software and database drivers preinstalled and ready to use with your existing license.
 
-Supported data sources include commonly-used relational databases such as Oracle, SQL Server, DB2, PostgreSQL, and others. Destinations include an Amazon service like Redshift, RDS or S3, as well as many EC2-supported technologies, including Snowflake.
+Supported data sources include commonly used relational databases: Oracle, SQL Server, Db2, PostgreSQL, and others. Destinations include Amazon services such as Redshift, Amazon Relational Database Service (Amazon RDS), and Amazon Simple Storage Service (Amazon S3), as well as many EC2-supported technologies, including Snowflake.
 
-HVR processes communicate over TPC/IP connections using SSL data encryption. To maximize efficiency run the HVR environment in the same region and availability zone of the target database or service.
-
+HVR processes communicate over TPC/IP connections using SSL data encryption.

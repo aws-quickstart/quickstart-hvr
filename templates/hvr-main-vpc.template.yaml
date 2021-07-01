@@ -122,9 +122,9 @@ Parameters:
 
   AvailabilityZones:
     Description: >-
-      List of Availability Zones to use for the subnets in the VPC. Only two
+      Availability Zones to use for the subnets in the VPC. Two
       Availability Zones are used for this deployment, and the logical order of
-      your selections is preserved.
+      your selections is preserved. To maximize efficiency, choose the same Availability Zone as the target database or service.
     Type: "List<AWS::EC2::AvailabilityZone::Name>"
 
   RemoteAccessCIDR:

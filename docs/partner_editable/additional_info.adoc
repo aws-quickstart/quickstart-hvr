@@ -1,4 +1,4 @@
-// Add steps as necessary for accessing the software, post-configuration, and testing. Don’t include full usage instructions for your software, but add links to your product documentation for that information.
+// Add steps as necessary for accessing the software, post-configuration, and testing. Don't include full usage instructions for your software, but add links to your product documentation for that information.
 //Should any sections not be applicable, remove them
 
 // == Test the deployment
@@ -20,9 +20,7 @@
 == Other useful information
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 
-For more detail on HVR Software, including documentation and whitepapers please see the following links
-
-*  https://www.hvr-software.com/[HVR Software Website^]
-*  https://www.hvr-software.com/solutions/aws-data-integration-hybrid-cloud/[HVR Software and AWS^]
-*  https://www.hvr-software.com/docs/5[HVR Online Documentation^]
-*  https://www.hvr-software.com/resources/whitepapers/[Whitepapers^]
+*  https://www.hvr-software.com/[HVR Software^]
+*  HVR and https://www.hvr-software.com/solutions/aws-data-integration-hybrid-cloud/[AWS Data Integration^]
+*  https://www.hvr-software.com/docs/5[HVR Documentation^]
+*  https://www.hvr-software.com/resources/whitepapers/[HVR Whitepapers^]

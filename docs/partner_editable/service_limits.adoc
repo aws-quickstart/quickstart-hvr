@@ -1,18 +1,20 @@
-// Replace the <n> in each row to specify the number of resources used in this deployment. Remove the rows for resources that aren’t used.
+// Replace the <n> in each row to specify the number of resources used in this deployment. Remove the rows for resources that aren't used.
 |===
 |Resource |This deployment uses
 
 // Space needed to maintain table headers
 |VPCs |1
 |Subnets |2
-|NAT Gateway |1
-|Internet Gateway|1
+|NAT gateway |1
+|Internet gateway|1
 |Security groups |3
 |AWS Identity and Access Management (IAM) roles |1
 |Auto Scaling groups |3
 |Network Load Balancers |3
 |c5 instances |4
 |Aurora PostgreSQL |1
-|Elastic Filesystem (EFS) |1
+|EFS file system |1
 |Secrets Manager secrets |4
 |===
+
+//TODO Tony, are there really three security groups? The diagram shows only two.

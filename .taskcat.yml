@@ -2,6 +2,7 @@ project:
   name: quickstart-hvr
   regions:
     - ap-southeast-2
+    - us-east-1
 
 tests:
   quickstart-hvr-test:
@@ -18,4 +19,5 @@ tests:
       QSS3KeyPrefix: "quickstart-hvr/"
     regions:
       - ap-southeast-2
+      - us-east-1
 

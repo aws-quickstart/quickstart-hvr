@@ -18,6 +18,6 @@ tests:
       QSS3BucketRegion: "$[taskcat_current_region]"
       QSS3KeyPrefix: "quickstart-hvr/"
     regions:
-      - ap-southeast-2
+      # - ap-southeast-2
       - us-east-1
 

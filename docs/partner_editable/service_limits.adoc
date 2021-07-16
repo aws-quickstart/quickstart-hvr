@@ -17,4 +17,4 @@
 |Secrets Manager secrets |4
 |===
 
-//TODO Tony, are there really three security groups? The diagram shows only two.
+//TODO Tony, are there really three security groups? The diagram shows only two. - Resolved

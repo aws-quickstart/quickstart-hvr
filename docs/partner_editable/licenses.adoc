@@ -4,4 +4,4 @@ This Quick Start requires a subscription to the https://aws.amazon.com/marketpla
 
 You must also create a Secrets Manager secret before you deploy this stack. This secret is the plain-text secret HVR license key. During deployment, you are asked to provide the ARN for this secret, which is located in Secrets Manager. If you deploy the Quick Start without supplying a license file, the process creates and uses an empty Secrets Manager secret. After you obtain your license, update this secret with the license details.
 
-//TODO Tony, Please confirm that these edited paragraphs are accurate and complete.
+//TODO Tony, Please confirm that these edited paragraphs are accurate and complete. - Resolved

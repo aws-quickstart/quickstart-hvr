@@ -7,7 +7,7 @@
 |Subnets |2
 |NAT gateway |1
 |Internet gateway|1
-|Security groups |3
+|Security groups |2
 |AWS Identity and Access Management (IAM) roles |1
 |Auto Scaling groups |3
 |Network Load Balancers |3

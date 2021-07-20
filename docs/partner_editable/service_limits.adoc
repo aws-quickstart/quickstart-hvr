@@ -12,9 +12,7 @@
 |Auto Scaling groups |3
 |Network Load Balancers |3
 |c5 instances |4
-|Aurora PostgreSQL |1
+|Aurora PostgreSQL-compatible edition |1
 |EFS file system |1
 |Secrets Manager secrets |4
 |===
-
-//TODO Tony, are there really three security groups? The diagram shows only two. - Resolved

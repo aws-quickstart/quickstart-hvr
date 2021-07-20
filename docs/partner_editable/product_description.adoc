@@ -2,11 +2,11 @@
 // Briefly describe the software. Use consistent and clear branding.
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-Common use cases for {partner-product-name} on AWS include analytics and reporting for data lakes, data warehouses, and consolidated databases using multiple AWS services to continuously integrate data. Examples:
+ You might use the {partner-product-name} Quick Start to set up analytics and reporting for data lakes, data warehouses, or consolidated databases using multiple AWS services to continuously integrate your data. Common use cases include the following:
 
-* Replicating data into data lakes, data warehouses, and consolidated reporting databases. For example, you might move data in near-real time from various source environments into Amazon Redshift or Snowflake.
-* Migrating data from on premises to the AWS Cloud using the same technology (homogeneous environments). For example, you might migrate data from an on-premises Oracle database into Oracle in the AWS Cloud.
-* Migrating data from on premises to the AWS Cloud moving data from one platform to another (heterogeneous environments). In this case, you might migrate gradually and have a fallback option.
+* Migrating data between homogeneous environments. For example, you might move data from an on-premises Oracle database into Oracle in the AWS Cloud.
+* Migrating data between heterogeneous environments. For example, you might move data from an on-premises Oracle database to Amazon Redshift in the AWS Cloud. In this case, you might migrate gradually and have a fallback option.
+* Replicating data. For example, you might move data in near-real time from various source environments into Amazon Redshift or Snowflake.
 
 In keeping with HVR's recommended best practice for high availability, this Quick Start deploys {partner-product-short name} in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows. 
 

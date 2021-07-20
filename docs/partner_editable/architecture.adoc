@@ -10,11 +10,11 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 
 * A highly available architecture that spans two Availability Zones.
 * A VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.
+* A Network Load Balancer to direct traffic to the bastion host.
 
 * In the public subnets:
 ** A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL AMI in AWS Marketplace. With this bastion host, you can use the HVR graphical user interface to configure the HVR software components—the HVR hub and agents—in the private subnets.
 ** A security group for inbound traffic from port 22 (for SSH) and 8080 (for `hvrwebdesktop`). Outbound traffic is limited to ports 22, 8080, 4343, and 443.
-** A Network Load Balancer to direct traffic to the bastion host.
 
 * In the private subnets:
 ** A Linux-based HVR hub instance in an Auto Scaling group behind a Network Load Balancer. This instance, which is based on the HVR BYOL AMI, controls all replication flows. It's attached to Amazon Elastic File System (EFS) to provide high availability. If the instance fails, a new HVR hub host is created and attached to the EFS file system.

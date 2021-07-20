@@ -1,25 +1,5 @@
 This guide provides instructions for deploying the {partner-product-name} Quick Start reference architecture on the AWS Cloud.
 
-This Quick Start is for organizations who want to use HVR to replicate data between transactional databases and file systems. The architecture supports real-time change data capture (CDC) and near-real-time replication between technologies in homogeneous or heterogeneous environments. 
-
-//TODO Tony, Please fill in the blank with our target audience. - Resolved
-
-Common use cases:
-
-*  Replicating data into data lakes, data warehouses and consolidated reporting databases.  Example, move data in near-real time from various source environments into Amazon Redshift or Snowflake.
-*  Migrating data from on-premises to the AWS Cloud. You may migrate using the same technology for a homogeneous environment - such as moving data from on-premise Oracle into Oracle in the AWS Cloud, or, for a heterogeneous migration where you move data from one platform to another, you may migrate gradually and have a fallback option.
+This Quick Start is for organizations that want to use HVR to replicate data between transactional databases and file systems. The architecture supports real-time change data capture (CDC) and near-real-time replication. You can use HVR to get your data-replication project up and running, from creating and loading tables, to using log-based CDC, to validating and repairing data, to monitoring.
 
 For details on source and target configuration options supported by HVR, see the https://www.hvr-software.com/docs/5[HVR documentation^] or the https://www.hvr-software.com[HVR Software website^].
-
-//TODO Tony, How could we state these two use cases more clearly and accurately? - Resolved
-//TODO Tony, Please move these examples up into the use-case list so that each use case bullet includes an example. - Resolved
-
-You can use HVR to get your data-replication project up and running, from creating and loading tables, to using log-based CDC, to validating and repairing data, to monitoring.
-
-//TODO Tony, what verb goes in this blank? - Resolved
-
-== Getting Started
-
-When you log in to the bastion host, HVR hub, or HVR agent, you see a message on using the images. Review the message. Also read the readme file located in the HVR Linux user home directory: */home/hvr/hvr-readme.txt*.
-
-To start the HVR GUI on the bastion host, connect to the host with SSH using your supplied key pair, and connect as the HVR Unix user: *sudo su - hvr*. Then run *hvrwebdesktop*, and follow the instructions.

@@ -4,7 +4,7 @@ Deploying this Quick Start for a new virtual private cloud (VPC) with default pa
 
 [#architecture1]
 .Architecture for the {partner-product-name} Quick Start on AWS
-image::../images/HVR_architecture_diagram.png[Architecture]
+image::../images/hvr-software-architecture-diagram.png[Architecture]
 
 As shown in <<architecture1>>, the Quick Start sets up the following:
 
@@ -12,22 +12,16 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 * A VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.
 
 * In the public subnets:
-** A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL Marketplace image. With this bastion host, you can use the HVR graphical user interface (GUI) to configure the HVR software components—the HVR hub and agents—in the private subnets.
-** A security group is defined which will allow ingress port 22 (for SSH) and 8080 (for HVR Webdesktop).  Egress ports are limited to port 22, 8080, 4343 and 443.  A Network Load Balancer (NLB) is used to direct traffic to the Bastion host which could be placed in any of the Avalability Zones in the public subnet.
-//TODO Tony, Please add a reference to the security group in the public subnets. – Resolved
-//TODO Tony, Please also add a reference to the Network Load Balancer (NLB) that's associated with that security group. – Resolved
+** A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL AMI in AWS Marketplace. With this bastion host, you can use the HVR graphical user interface to configure the HVR software components—the HVR hub and agents—in the private subnets.
+** A security group for inbound traffic from port 22 (for SSH) and 8080 (for `hvrwebdesktop`). Outbound traffic is limited to ports 22, 8080, 4343, and 443. 
+** A Network Load Balancer to direct traffic to the bastion host. You can place the Network Load Balancer in either Availability Zone.
 
 * In the private subnets:
-** A Linux-based HVR hub instance in an Auto Scaling group behind a Network Load Balancer. This instance, which is based on the HVR BYOL Marketplace image, controls all replication flows. It's attached to an Amazon Elastic File System (EFS) file system to provide high availability. If the instance fails, a new HVR hub host is created and attached to the EFS file system.
-** Two Linux-based HVR agent instances in an Auto Scaling group behind a Network Load Balancer. These instances are based on the HVR BYOL Marketplace image.
-** (Optional) An Amazon Aurora PostgreSQL-Compatible Edition repository database for the HVR hub - if selected to create this you will be presented with an environment which includes multiple reader instances with one writer. Alternatively, you can use an existing database if you prefer. This database does not have to be PostgreSQL; other supported databases include MySQL, MariaDB, SQL Server, and Oracle.
-** The HVR hub and Agent instances are protected by addtional Security Groups which will limit Ingress ports to 4343 (HVR), 22 (SSH), 2049 (EFS).  Egress ports are not limited.
-//TODO Tony, Please add a reference to the security group in the private subnets. – Resolved
-//TODO Tony, Please add a reference to the reader and writer icons. – Resolved
+** A Linux-based HVR hub instance in an Auto Scaling group behind a Network Load Balancer. This instance, which is based on the HVR BYOL AMI, controls all replication flows. It's attached to Amazon Elastic File System (EFS) to provide high availability. If the instance fails, a new HVR hub host is created and attached to the EFS file system.
+** Two Linux-based HVR agent instances in an Auto Scaling group behind a Network Load Balancer. These instances are based on the HVR BYOL AMI.
+** (Optional) An Amazon Aurora PostgreSQL-compatible repository database for the HVR hub. This option includes multiple reader instances with one writer. Alternatively, you can use an existing database. The database does not have to be PostgreSQL. Other supported databases include MySQL, MariaDB, SQL Server, and Oracle.
+** The HVR hub and agent instances, which are protected by additional security groups. These security groups limit inbound traffic to ports 4343 (HVR), 22 (SSH), 2049 (Amazon EFS). Outbound traffic is not limited.
 
-* AWS Secrets Manager, is used for storing secrets such as passswords used by the Quick Start.  These secrets include database and operatings sytem (EC2) user passwords, the HVR License as well as Public and Private keys used for secure communication.  The deployment process does provides more details that enable the HVR components to access and use these secrets. Sample certificates (public and private) are provided as part of the Quick Start - updating these are recommended.
-//TODO Tony, How could we phrase the preceding bullet more simply and concisely? – Resolved
-* (Optional) Amazon Simple Notification Service (Amazon SNS), is used by the (Optional) Amazon Aurora PostgreSQL environment for cloudwatch alarms and RDS Event notifications.
-//TODO Tony, Please fill in the SNS blank. – Resolved
+* AWS Secrets Manager for storing secrets, such as passwords used by the Quick Start. These secrets include database and operating system (EC2) user passwords, the HVR license, public keys, and private keys used for secure communication. The deployment process provides details that enable the HVR components to access and use these secrets.
 
-//TODO Tony, Please move this information about the ports to the section where people need it. The bulleted list in this "Architecture" section includes only the elements shown in the diagram. – Resolved
+* (Optional) Amazon Simple Notification Service (Amazon SNS), which the Amazon Aurora PostgreSQL-compatible environment uses for alarms and event notifications.

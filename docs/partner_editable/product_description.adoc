@@ -2,14 +2,20 @@
 // Briefly describe the software. Use consistent and clear branding.
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-In keeping with HVR's recommended best practice for high availability, this Quick Start deploys HVR in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows. This architecture provides the following benefits:
+Common use cases include the following:
 
-*  Performance: It provides local access to data and compressed, optimized communication.
-*  Scalability: It distributes resource-intensive processing so that you can manage many replication flows through a single control environment.
-*  Security: It uses encrypted communication and a proxy to avoid opening a firewall directly into a production database.
+* Replicating data into data lakes, data warehouses, and consolidated reporting databases. For example, you might move data in near-real time from various source environments into Amazon Redshift or Snowflake.
+* Migrating data from on premises to the AWS Cloud using the same technology (homogeneous migration). For example, you might migrate data from an on-premises Oracle database into Oracle in the AWS Cloud.
+* Migrating data from on premises to the AWS Cloud moving data from one platform to another (heterogeneous migration). In this case, you might migrate gradually and have a fallback option.
 
-The HVR hub and agent instances use the HVR BYOL Marketplace image, which has the HVR software and database drivers preinstalled and ready to use with your existing license.
+In keeping with HVR's recommended best practice for high availability, this Quick Start deploys {partner-product-short name} in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows. 
 
-Supported data sources include commonly used relational databases: Oracle, SQL Server, Db2, PostgreSQL, and others. Destinations include Amazon services such as Redshift, Amazon Relational Database Service (Amazon RDS), and Amazon Simple Storage Service (Amazon S3), as well as many EC2-supported technologies, including Snowflake.
+This architecture provides the following benefits:
+
+* Performance: It provides local access to data and compressed, optimized communication.
+* Scalability: It distributes resource-intensive processing so that you can manage many replication flows through a single control environment.
+* Security: It uses encrypted communication and a proxy to avoid opening a firewall directly into a production database.
+
+Supported data sources include commonly used relational databases: Oracle, Microsoft SQL Server, Db2, PostgreSQL, and others. Destinations include Amazon services such as Amazon Redshift, Amazon Relational Database Service (Amazon RDS), and Amazon Simple Storage Service (Amazon S3), as well as many Amazon Elastic Compute Cloud (Amazon EC2)-supported technologies, including Snowflake.
 
 HVR processes communicate over TPC/IP connections using SSL data encryption.

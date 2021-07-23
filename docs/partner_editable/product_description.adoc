@@ -18,4 +18,4 @@ This architecture provides the following benefits:
 
 Supported data sources include commonly used relational databases: Oracle, Microsoft SQL Server, Db2, PostgreSQL, and others. Destinations include Amazon services such as Amazon Redshift, Amazon Relational Database Service (Amazon RDS), and Amazon Simple Storage Service (Amazon S3), as well as many Amazon Elastic Compute Cloud (Amazon EC2)-supported technologies, including Snowflake.
 
-HVR processes communicate over TPC/IP connections using SSL data encryption.
+HVR processes communicate over TCP/IP connections using SSL data encryption.

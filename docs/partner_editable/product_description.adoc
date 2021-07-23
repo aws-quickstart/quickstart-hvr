@@ -9,7 +9,7 @@ Use cases for this Quick Start include the following:
 * Replicate data. For example, you might move data from various source environments to Amazon Redshift or Snowflake in near-real time.
 * Set up analytics and reporting for data lakes, data warehouses, or consolidated databases using multiple AWS services to continuously integrate your data.
 
-In keeping with HVR's recommended best practice for high availability, this Quick Start deploys {partner-product-name} in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows.
+In keeping with HVR's recommended best practice for high availability, this Quick Start deploys {partner-product-short-name} in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows.
 
 This architecture provides the following benefits:
 

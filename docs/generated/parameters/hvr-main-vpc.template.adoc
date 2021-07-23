@@ -1,59 +1,59 @@
 
-.End User License Agreement (EULA) - HVR CDC
+.End-user license agreement (EULA) for HVR CDC
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|Accepted EULA from AWS Marketplace
-(`AcceptedEULA`)|`yes`|PLEASE READ THE HVR SOFTWARE LICENSE AGREEMENT (https://www.hvr-software.com/license-agreement/) CAREFULLY BEFORE USING THE SOFTWARE. The HVR stack can be created only if you have already accepted the EULA. To accept the EULA, see https://aws.amazon.com/marketplace/pp/B077YM8HPW.
+|Parameter label (name) |Default value|Description|Accepted EULA
+(`AcceptedEULA`)|`yes`|Read the HVR Software end-user license agreement (https://www.hvr-software.com/license-agreement/) carefully before using the software. The HVR stack can be created only after you accept the EULA. To accept the EULA from AWS Marketplace, see https://aws.amazon.com/marketplace/pp/B077YM8HPW.
 |===
 .VPC network configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
 |Parameter label (name) |Default value|Description|Availability Zones
-(`AvailabilityZones`)|`**__Requires input__**`|Availability Zones to use for the subnets in the VPC. Two Availability Zones are used for this deployment, and the logical order of your selections is preserved. To maximize efficiency, choose the same Availability Zone as the target database or service.|CIDR Block for the VPC
-(`VPCCIDR`)|`10.0.0.0/16`|CIDR block for the VPC|Public CIDR Block AZ 1
-(`PublicSubnet1CIDR`)|`10.0.128.0/20`|CIDR block for the public subnet 1 located in Availability Zone 1 - The Bastion host will be deployed here.|Public CIDR Block AZ 2
-(`PublicSubnet2CIDR`)|`10.0.144.0/20`|CIDR block for the public subnet 1 located in Availability Zone 2 - The Bastion host will be deployed here.|Private CIDR Block AZ 1
-(`PrivateSubnet1CIDR`)|`10.0.0.0/19`|CIDR block for private subnet 1 located in Availability Zone 1 - HVR Hub, Agent and Aurora/Postgress DB will be deployed here.|Private CIDR Block AZ 2
-(`PrivateSubnet2CIDR`)|`10.0.32.0/19`|CIDR block for private subnet 2 located in Availability Zone 2 - HVR Hub, Agent and Aurora/Postgress DB will be deployed here.|Allowed CIDR to Bastion Host
-(`RemoteAccessCIDR`)|`**__Requires input__**`|The CIDR address from which you will connect to the Bastion Host.
+(`AvailabilityZones`)|`**__Requires input__**`|Availability Zones to use for the subnets in the VPC. Two Availability Zones are used for this deployment, and the logical order of your selections is preserved. To maximize efficiency, choose the same Availability Zone as the target database or service.|VPC CIDR
+(`VPCCIDR`)|`10.0.0.0/16`|CIDR block for the VPC.|Public subnet 1 CIDR
+(`PublicSubnet1CIDR`)|`10.0.128.0/20`|CIDR block for public subnet 1 located in Availability Zone 1. The bastion host is deployed here.|Public subnet 2 CIDR
+(`PublicSubnet2CIDR`)|`10.0.144.0/20`|CIDR block for public subnet 2 located in Availability Zone 2. The bastion host is deployed here.|Private subnet 1 CIDR
+(`PrivateSubnet1CIDR`)|`10.0.0.0/19`|CIDR block for private subnet 1 located in Availability Zone 1. The HVR hub, agent, and Aurora/PostgreSQL database are deployed here.|Private subnet 2 CIDR
+(`PrivateSubnet2CIDR`)|`10.0.32.0/19`|CIDR block for private subnet 2 located in Availability Zone 2. The HVR hub, agent, and Aurora/PostgreSQL database are deployed here.|Allowed CIDR to bastion host
+(`RemoteAccessCIDR`)|`**__Requires input__**`|CIDR address from which you will connect to the bastion host.
 |===
-.HVR EC2 Configuration
+.HVR EC2 configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|HVR EC2 instance type for HVR HUB
-(`HVRInstanceTypeHUB`)|`c5.large`|EC2 instance type - for HVR HUB|HVR EC2 instance type for HVR Agent
-(`HVRInstanceTypeAgent`)|`c5.large`|EC2 instance type - for HVR Agent running Capture/Integrate|Key pair name
-(`KeyName`)|`**__Requires input__**`|Name of an existing EC2 KeyPair to enable SSH access to the instance
+|Parameter label (name) |Default value|Description|EC2 instance type for HVR hub
+(`HVRInstanceTypeHUB`)|`c5.large`|EC2 instance type for the HVR hub.|EC2 instance type for HVR agent
+(`HVRInstanceTypeAgent`)|`c5.large`|EC2 instance type for the HVR agent running capture/integrate.|EC2 key pair name
+(`KeyName`)|`**__Requires input__**`|Name of the key pair to be used to connect to your EC2 instances by using SSH.
 |===
 .Tag identifiers
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|Environment Tag
+|Parameter label (name) |Default value|Description|Environment tag
 (`TagEnvironment`)|`dev`|Designates the environment stage of the associated AWS resource.
 |===
-.HVR License Key (Secret Parameter ARN)
+.HVR license key (secret parameter ARN)
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|HVR License Key (Secret ARN)
-(`HVRLicenseSecret`)|`none`|Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
-If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
-If you require a license please contact the HVR Software sales team and leave the value as "none".
+|Parameter label (name) |Default value|Description|HVR license key
+(`HVRLicenseSecret`)|`none`|Specify the ARN to the secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
+If no value is specified, a temporary dummy secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
+If you require a license, leave the value as "none," and contact the HVR Software sales team.
 
 |===
 .HVR Aurora/PostgreSQL configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|Do you want to create Aurora Postgres stack?
-(`EnablePGStack`)|`true`|Enables or disables creation of an Amazon Aurora Postgresql RDS stack. If true, an Amazon Aurora Postgresql RDS stack will be created.|Allowed CIDR that will have DB access
-(`DBAccessCIDR`)|`10.0.0.0/18`|The Private CIDR address from which you will connect to the DB Instance.|Aurora/PostgreSQL instance class
-(`PGInstanceClass`)|`db.r5.large`|The Aurora/PostgreSQL database instance class.|SNS notification email for Aurora/PostgreSQL notifications
-(`NotificationList`)|`ops@company.com`|The email notification that is used to configure an SNS topic for sending an Amazon CloudWatch alarm and Amazon RDS event notifications.
+|Parameter label (name) |Default value|Description|Enable Aurora/PostgreSQL stack
+(`EnablePGStack`)|`true`|Choose "false" if you don't want to create an Amazon Aurora/PostgreSQL RDS stack.|Allowed CIDR for database access
+(`DBAccessCIDR`)|`10.0.0.0/18`|Private CIDR address from which you will connect to the database instance.|Aurora/PostgreSQL instance class
+(`PGInstanceClass`)|`db.r5.large`|Aurora/PostgreSQL database instance class.|Email address for Aurora/PostgreSQL notifications
+(`NotificationList`)|`ops@company.com`|Email notification that is used to configure an SNS topic for sending an Amazon CloudWatch alarm and Amazon RDS event notifications.
 |===
-.AWS Quick Start configuration S3 Bucket/Prefix
+.AWS Quick Start configuration
 [width="100%",cols="16%,11%,73%",options="header",]
 |===
-|Parameter label (name) |Default value|Description|S3 Region for S3 Bucket
-(`QSS3BucketRegion`)|`ap-southeast-2`|The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.|Quick Start S3 bucket name
-(`QSS3BucketName`)|`ae-quickstart-aws-hvr`|The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).|Quick Start S3 Key prefix
-(`QSS3KeyPrefix`)|`quickstart-hvr/`|The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).
+|Parameter label (name) |Default value|Description|Quick Start S3 bucket Region
+(`QSS3BucketRegion`)|`ap-southeast-2`|AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See https://aws-quickstart.github.io/option1.html.|Quick Start S3 bucket name
+(`QSS3BucketName`)|`ae-quickstart-aws-hvr`|Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). See https://aws-quickstart.github.io/option1.html.|Quick Start S3 key prefix
+(`QSS3KeyPrefix`)|`quickstart-hvr/`|S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. See https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html and https://aws-quickstart.github.io/option1.html.
 |===

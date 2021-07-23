@@ -2,11 +2,12 @@
 // Briefly describe the software. Use consistent and clear branding.
 // Include the benefits of using the software on AWS, and provide details on usage scenarios.
 
-You might use the {partner-product-name} Quick Start to set up analytics and reporting for data lakes, data warehouses, or consolidated databases using multiple AWS services to continuously integrate your data. Common use cases include the following:
+Use cases for this Quick Start include the following:
 
-* Migrating data between homogeneous environments. For example, you might move data from an on-premises Oracle database into Oracle in the AWS Cloud.
-* Migrating data between heterogeneous environments. For example, you might move data from an on-premises Oracle database to Amazon Redshift in the AWS Cloud. In this case, you might migrate gradually and have a fallback option.
-* Replicating data. For example, you might move data in near-real time from various source environments into Amazon Redshift or Snowflake.
+* Migrate data between homogeneous environments. For example, you might move data from an on-premises Oracle database to Oracle in the AWS Cloud.
+* Migrate data between heterogeneous environments. For example, you might move data from an on-premises Oracle database to Amazon Redshift in the AWS Cloud. In this case, you might migrate gradually and have a fallback option.
+* Replicate data. For example, you might move data from various source environments to Amazon Redshift or Snowflake in near-real time.
+* Set up analytics and reporting for data lakes, data warehouses, or consolidated databases using multiple AWS services to continuously integrate your data.
 
 In keeping with HVR's recommended best practice for high availability, this Quick Start deploys {partner-product-short-name} in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows.
 

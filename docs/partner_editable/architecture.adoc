@@ -14,10 +14,10 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 
 * In the public subnets:
 ** A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL AMI in AWS Marketplace. With this bastion host, you can use the HVR graphical user interface to configure the HVR software components—the HVR hub and agents—in the private subnets.
-** A security group for limiting inbound traffic from port 22 (for SSH) and 8080 (for `hvrwebdesktop`). Outbound traffic is limited to ports 22, 8080, 4343, and 443.
+** A security group for limiting inbound and outbound traffic.
 
 * In the private subnets:
-** A Linux-based HVR hub instance in an Auto Scaling group. This instance, which is based on the HVR BYOL AMI, controls all replication flows. 
+** A Linux-based HVR hub instance in an Auto Scaling group. This instance, which is based on the HVR BYOL AMI, controls all replication flows.
 ** Two Linux-based HVR agent instances in an Auto Scaling group, one instance in each private subnet. These instances, which are based on the HVR BYOL AMI, are close to replication endpoints.
 ** A security group for limiting inbound traffic to ports 4343 (HVR), 22 (SSH), 2049 (Amazon Elastic File System [Amazon EFS]). Outbound traffic is not limited.
 

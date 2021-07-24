@@ -6,5 +6,5 @@
 	url = https://github.com/aws-quickstart/quickstart-aws-vpc.git
 [submodule "submodules/quickstart-amazon-aurora-postgresql"]
 	path = submodules/quickstart-amazon-aurora-postgresql
-	url = git@github.com:aws-quickstart/quickstart-amazon-aurora-postgresql.git
+	url = https://github.com/aws-quickstart/quickstart-amazon-aurora-postgresql.git
 	branch = main

@@ -1,6 +1,3 @@
 
-=== Launch into a new VPC
+=== Parameters for deploying into a new VPC
 include::hvr-main-vpc.template.adoc[]
-
-=== Launch into an existing VPC
-include::hvr.workload.vpc.template.adoc[]

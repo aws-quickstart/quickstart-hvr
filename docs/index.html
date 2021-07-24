@@ -843,13 +843,13 @@ p.footer-text a{color:#d7d8d8}
 <li><a href="#_launch_the_quick_start">Launch the Quick Start</a></li>
 </ul>
 </li>
+<li><a href="#_getting_started">Getting started</a></li>
 <li><a href="#_other_useful_information">Other useful information</a></li>
 <li><a href="#_faq">FAQ</a></li>
-<li><a href="#_troubleshooting">Troubleshooting</a></li>
+<li><a href="#_customer_responsibility">Customer responsibility</a></li>
 <li><a href="#_parameter_reference">Parameter reference</a>
 <ul class="sectlevel2">
-<li><a href="#_launch_into_a_new_vpc">Launch into a new VPC</a></li>
-<li><a href="#_launch_into_an_existing_vpc">Launch into an existing VPC</a></li>
+<li><a href="#_parameters_for_deploying_into_a_new_vpc">Parameters for deploying into a new VPC</a></li>
 </ul>
 </li>
 <li><a href="#_send_us_feedback">Send us feedback</a></li>
@@ -869,25 +869,12 @@ p.footer-text a{color:#d7d8d8}
 <img src="https://aws-quickstart.s3.amazonaws.com/quickstart-documentation-base/docs/boilerplate/.images/aws-quickstart-graphic.png" alt="QS" width="80" height="80">
 </div>
 </div>
-<h3 id="_draft_document_unofficial_guidance" class="discrete text-center">DRAFT DOCUMENT / UNOFFICIAL GUIDANCE</h3>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/__settings</em>.adoc</code></strong>_</p>
+<div class="paragraph text-center">
+<p><strong>July 2021</strong><br>
+<em>Kevin Thompson, Anton Els, HVR Software</em><br>
+<em>Tony Bulding, AWS Quick Start team</em></p>
 </div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph text-center">
-<p><strong>May 2021</strong><br>
-<em>HVR Software</em><br>
-<em>Toni Bulding, AWS Quick Start team</em></p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
-<div class="admonitionblock tip">
+<div class="admonitionblock tip text-left">
 <table>
 <tr>
 <td class="icon">
@@ -909,44 +896,14 @@ report bugs, or submit feature ideas for this Quick Start.
 <h2 id="_overview">Overview</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/overview_target_and_usage.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This guide provides instructions for deploying the HVR Quick Start reference architecture on the AWS Cloud.
-HVR’s real-time data replication technology replicates data between transactional databases as well as file systems in heterogeneous configurations. For optimum efficiency HVR is deployed in a distributed setup. Such deployment consists of installations of the HVR technology that act as agents, close to replication end points, and an installation that acts as the hub to control all replication flows.</p>
+<p>This guide provides instructions for deploying the HVR Software Quick Start reference architecture on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p>At a high level the distributed setup provides the following benefits:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Performance, with local access to data and compressed, optimized communication.</p>
-</li>
-<li>
-<p>Scalability, distributing resource-intensive processing, and allowing for many replication flows managed through a single control environment.</p>
-</li>
-<li>
-<p>Security, enabling encrypted communication and the use of a proxy to avoid having to open up a firewall directly into a production database.</p>
-</li>
-</ul>
+<p>This Quick Start is for organizations that want to use HVR to replicate data between transactional databases and file systems. The architecture supports real-time change data capture (CDC) for databases, analytics, and migrations.</p>
 </div>
 <div class="paragraph">
-<p>For example, if you are looking at replicating data in real-time between various database environments such as Oracle to PostgreSQL, then this Quick Start is an excellent option for you to get started. Other use cases also include moving data in near real-time from various source environments into AWS Redshift or even Snowflake. For more details on the various source and target configuration options supported by HVR, please see the HVR online documentation, or HVR’s website at <a href="https://www.hvr-software.com" class="bare">https://www.hvr-software.com</a>.
-This Quick Start helps you get started with an initial deployment following HVR’s recommended best practice of a distributed setup, enabling high availability out-of-the-box. With many options to customize the deployment, this Quick Start installs multiple  components that are  ready for you to use.</p>
+<p>For details on source and target configuration options supported by HVR, see the <a href="https://www.hvr-software.com/docs/5" target="_blank" rel="noopener">HVR documentation</a> or the <a href="https://www.hvr-software.com" target="_blank" rel="noopener">HVR Software website</a>.</p>
 </div>
-<div class="paragraph">
-<p>At a high level the quick start will create an HVR Hub and repository database (using AWS RDS Aurora for PostgreSQL), as well as an HVR Agent configuration. The HVR components will be deployed in a new VPC within a private subnet across two availability zones - selected by you during deployment. You may choose to not create the repository database in case you already have an existing database you prefer to use. The repository database does not have to be PostgreSQL, and a number of other databases are supported including MySQL, MariaDB, SQL Server and Oracle. For the HVR Hub and Agent instances, the HVR BYOL Marketplace Image is used which has already pre-installed the HVR software and database drivers ready for you to start using with your existing license.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 <div class="admonitionblock note">
 <table>
 <tr>
@@ -965,42 +922,49 @@ Amazon may share user-deployment information with the AWS Partner that collabora
 <h2 id="_hvr_software_on_aws">HVR Software on AWS</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/product_description.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>Efficient Change Data Capture and near real-time replication between technologies in homogeneous or heterogeneous environments enables several use cases. The most common ones are:</p>
+<p>Use cases for this Quick Start include the following:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p>Analytics and reporting, building data lakes, data warehouses and consolidated reporting databases leveraging multiple AWS services.</p>
+<p>Migrate data between homogeneous environments. For example, you might move data from an on-premises Oracle database to Oracle in the AWS Cloud.</p>
 </li>
 <li>
-<p>High availability, leveraging AWS regions to ensure data is available 24x7.</p>
+<p>Migrate data between heterogeneous environments. For example, you might move data from an on-premises Oracle database to Amazon Redshift in the AWS Cloud. In this case, you might migrate gradually and have a fallback option.</p>
 </li>
 <li>
-<p>Data migration, between on-premises environments and AWS, either leveraging the same technology or for a heterogeneous migration, with the ability to gradually migrate and have a fallback option.</p>
+<p>Replicate data. For example, you might move data from various source environments to Amazon Redshift or Snowflake in near-real time.</p>
+</li>
+<li>
+<p>Set up analytics and reporting for data lakes, data warehouses, or consolidated databases using multiple AWS services to continuously integrate your data.</p>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p>HVR provides the complete set of features necessary to get your data replication project up and running from beginning to end: table creation and initial load, log-based CDC, data validation and repair, and monitoring.</p>
+<p>In keeping with HVR&#8217;s recommended best practice for high availability, this Quick Start deploys HVR in a distributed architecture. The distributed architecture includes two HVR agents that are close to replication endpoints and an HVR hub that controls all replication flows.</p>
 </div>
 <div class="paragraph">
-<p>Supported data sources include commonly-used relational databases such as Oracle, SQL Server, DB2, PostgreSQL, and others. Destinations include an Amazon service like Redshift, RDS or S3, as well as many EC2-supported technologies, including Snowflake.</p>
+<p>This architecture provides the following benefits:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Performance: It provides local access to data and compressed, optimized communication.</p>
+</li>
+<li>
+<p>Scalability: It distributes resource-intensive processing so that you can manage many replication flows through a single control environment.</p>
+</li>
+<li>
+<p>Security: It uses encrypted communication and a proxy to avoid opening a firewall directly into a production database.</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
-<p>HVR processes communicate over TPC/IP connections using SSL data encryption. To maximize efficiency run the HVR environment in the same region and availability zone of the target database or service.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+<p>Supported data sources include commonly used relational databases: Oracle, Microsoft SQL Server, Db2, PostgreSQL, and others. Destinations include Amazon services such as Amazon Redshift, Amazon Relational Database Service (Amazon RDS), and Amazon Simple Storage Service (Amazon S3), as well as many Amazon Elastic Compute Cloud (Amazon EC2)-supported technologies, including Snowflake.</p>
+</div>
+<div class="paragraph">
+<p>HVR processes communicate over TCP/IP connections using SSL data encryption.</p>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1034,51 +998,27 @@ After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/aw
 <h2 id="_software_licenses">Software licenses</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/licenses.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start requires a license for HVR.</p>
+<p>This Quick Start requires a subscription to the <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" target="_blank" rel="noopener">HVR for AWS - Bring Your Own License</a> (BYOL) Amazon Machine Image (AMI) through AWS Marketplace. The HVR hub and agent instances use this AMI. This AMI has the HVR software and database drivers preinstalled and ready to use with your existing license.</p>
 </div>
 <div class="paragraph">
-<p>To obtain a license if you do not already have one, please contact the HVR team using <a href="mailto:info@hvr-software.com">info@hvr-software.com</a> or via the HVR Software website <a href="https://www.hvr-software.com" class="bare">https://www.hvr-software.com</a>.</p>
+<p>You need a valid license key to deploy this stack. To obtain a license if you don&#8217;t already have one, contact the HVR team at <a href="mailto:info@hvr-software.com">info@hvr-software.com</a> or use the <a href="https://www.hvr-software.com" target="_blank" rel="noopener">HVR Software website</a>. Additional pricing, terms, and conditions may apply. For instructions, see the <a href="#_subscribe_to_the_hvr_ami">Subscribe to the HVR AMI</a> section in this guide.</p>
 </div>
 <div class="paragraph">
-<p>A Secrets Manager Secret must be created prior to deploying this stack. This secret is the plain text secret HVR License Key. During the deployment you will be asked to provide the ARN for this secret - located in Secrets Manager. If no value is provided an new Secret with empty value will be created. Once you will have obtained a valid license, you can update this secret with the value.</p>
+<p>You must also create a Secrets Manager secret before you deploy this stack. This secret is the plaintext secret HVR license key. During deployment, you are asked to provide the ARN for this secret, which is located in Secrets Manager. If you deploy the Quick Start without supplying a license file, the process creates and uses an empty Secrets Manager secret. After you obtain your license, update this secret with the license details.</p>
 </div>
-<div class="paragraph">
-<p>Note: This Quickstart makes use of the HVR Bring Your Own License (BYOL) AMI which can be found on the <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" target="_blank" rel="noopener">AWS Marketplace</a></p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_architecture">Architecture</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/architecture.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
 <p>Deploying this Quick Start for a new virtual private cloud (VPC) with default parameters builds the following HVR environment in the AWS Cloud.</p>
 </div>
 <div id="architecture1" class="imageblock">
 <div class="content">
-<img src="images/architecture_diagram.png" alt="Architecture">
+<img src="images/hvr-software-architecture-diagram.png" alt="Architecture">
 </div>
-<div class="title">Figure 1. Quick Start architecture for HVR on AWS</div>
+<div class="title">Figure 1. Architecture for the HVR Software Quick Start on AWS</div>
 </div>
 <div class="paragraph">
 <p>As shown in <a href="#architecture1">Figure 1</a>, the Quick Start sets up the following:</p>
@@ -1089,17 +1029,20 @@ After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/aw
 <p>A highly available architecture that spans two Availability Zones.</p>
 </li>
 <li>
-<p>A newly created VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.</p>
+<p>A VPC configured with public and private subnets, according to AWS best practices, to provide you with your own virtual network on AWS.</p>
+</li>
+<li>
+<p>Two Network Load Balancers to direct traffic, one for the public subnets and one for the private subnets. Each Network Load Balancer is located within a security group.</p>
 </li>
 <li>
 <p>In the public subnets:</p>
 <div class="ulist">
 <ul>
 <li>
-<p>Managed network address translation (NAT) gateways to allow outbound internet access for resources in the private subnets.</p>
+<p>A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL AMI in AWS Marketplace. With this bastion host, you can use the HVR graphical user interface to configure the HVR software components—the HVR hub and agents—in the private subnets.</p>
 </li>
 <li>
-<p>A Linux bastion host in an Auto Scaling group to allow inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The Linux host is based on the HVR BYOL Marketplace image and will allow you to access the HVR GUI to configure the HVR software components in the private subnets.</p>
+<p>A security group for limiting inbound and outbound traffic.</p>
 </li>
 </ul>
 </div>
@@ -1109,79 +1052,31 @@ After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/aw
 <div class="ulist">
 <ul>
 <li>
-<p>The HVR Hub instance is Linux based and part of an Auto Scaling group behind a network load balancer. Only one HVR Hub instance will be created, with an EFS file system attached. In case of failure, a new HVR Hub host will be created and attached to the EFS filesystem.</p>
+<p>A Linux-based HVR hub instance in an Auto Scaling group. This instance, which is based on the HVR BYOL AMI, controls all replication flows.</p>
 </li>
 <li>
-<p>Two Linux-based HVR Agent instances in an Auto Scaling group behind a Network Load Balancer will be created.</p>
+<p>Two Linux-based HVR agent instances in an Auto Scaling group, one instance in each private subnet. These instances, which are based on the HVR BYOL AMI, are close to replication endpoints.</p>
 </li>
 <li>
-<p>An AWS Aurora PostgreSQL database for use as the HVR Hub repository database. Creating the Aurora PostgreSQL database is highly recommended, but optional if you already have an existing database for use as the HVR Hub repository.</p>
+<p>A security group for limiting inbound traffic to ports 4343 (HVR), 22 (SSH), 2049 (Amazon Elastic File System [Amazon EFS]). Outbound traffic is not limited.</p>
 </li>
 </ul>
 </div>
 </li>
 <li>
-<p><strong>Restricted Port Access</strong></p>
-<div class="ulist">
-<ul>
-<li>
-<p>Port 22 and 8080 is open for connections to the Bastion host.</p>
-<div class="ulist">
-<ul>
-<li>
-<p>Port 22 is used for SSH access (note that a valid key pair is required to access the host).</p>
+<p>An Amazon EFS file system attached to the HVR hub instance for high availability. If the HVR hub instance fails, a new one is created and attached to the EFS file system.</p>
 </li>
 <li>
-<p>Port 8080 can be used to access the HVR Web Desktop to establish a remote connection to the HVR Hub for configuration.</p>
+<p>(Optional) An Amazon Aurora PostgreSQL–compatible repository database for the HVR hub. This option includes multiple reader instances in one private subnet and one writer in the other private subnet. Alternatively, you can use an existing database. The database does not have to be PostgreSQL. Other supported databases include MySQL, MariaDB, SQL Server, and Oracle.</p>
+</li>
+<li>
+<p>AWS Secrets Manager for storing secrets, such as passwords used by the Quick Start. These secrets include database and operating system (EC2) user passwords, the HVR license, public keys, and private keys used for secure communication. The deployment process provides details that enable the HVR components to access and use these secrets.</p>
+</li>
+<li>
+<p>(Optional) Amazon Simple Notification Service (Amazon SNS), which the Amazon Aurora PostgreSQL–compatible environment uses for alarms and event notifications.</p>
 </li>
 </ul>
 </div>
-</li>
-<li>
-<p>The HVR Hub and Agents are behind Network Load Balancers using port 4343 for HVR Communication.</p>
-</li>
-<li>
-<p>The Bastion host will be able to connect to the Hub and Agents via port 4343 and 22 (SSH) - ssh will require the specified key pair.</p>
-</li>
-</ul>
-</div>
-</li>
-</ul>
-</div>
-<div class="paragraph">
-<p>In summary all components created include:</p>
-</div>
-<div class="ulist">
-<ul>
-<li>
-<p>Bastion host - based on HVR BYOL Marketplace Image.</p>
-</li>
-<li>
-<p>HVR Hub Instance - based on the HVR BYOL Marketplace Image.</p>
-</li>
-<li>
-<p>HVR Agent Instances (2) - based on the HVR BYOL Marketplace Image.</p>
-</li>
-<li>
-<p>Network Load Balancers.</p>
-</li>
-<li>
-<p>Secrets Manager - Used for Database and OS User Passwords.</p>
-</li>
-<li>
-<p>Secrets Manager - A secret with the HVR License information should be created and the details supplied on execution of the quickstart to allow the HVR components to access and use the license details.</p>
-</li>
-<li>
-<p>Secrets Manager - Used for the HVR Public/Private certificates for secure communication. Sample certificates are provided as part of the templates.</p>
-</li>
-<li>
-<p>Aurora PostgreSQL - Database used as HVR Hub Repository.</p>
-</li>
-</ul>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="sect1">
@@ -1196,20 +1091,8 @@ and <a href="https://aws.amazon.com/training/" target="_blank" rel="noopener">AW
 deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </div>
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/specialized_knowledge.adoc</code></strong></em></p>
+<p>This Quick Start also assumes familiarity with basic concepts in networking, database operations, and data replication.</p>
 </div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start also assumes familiarity with basic concepts in networking, database operations and data replication.</p>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="sect2">
 <h3 id="_aws_account">AWS account</h3>
@@ -1230,10 +1113,6 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 <div class="paragraph">
 <p>If necessary, request <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">service quota increases</a> for the following resources. You might need to request increases if your existing deployment currently uses these resources and if this Quick Start deployment could result in exceeding the default quotas. The <a href="https://console.aws.amazon.com/servicequotas/home?region=us-east-2#!/" target="_blank" rel="noopener">Service Quotas console</a> displays your usage and quotas for some aspects of some services. For more information, see <a href="https://docs.aws.amazon.com/servicequotas/latest/userguide/intro.html" target="_blank" rel="noopener">What is Service Quotas?</a> and <a href="https://docs.aws.amazon.com/general/latest/gr/aws_service_limits.html" target="_blank" rel="noopener">AWS service quotas</a>.</p>
 </div>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/service_limits.adoc</code></strong></em></p>
-</div>
-<div class="preview_mode">
 <table class="tableblock frame-all grid-all stretch">
 <colgroup>
 <col style="width: 50%;">
@@ -1255,16 +1134,16 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 <td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">NAT Gateway</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">NAT gateway</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Internet Gateway</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Internet gateway</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Security groups</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">AWS Identity and Access Management (IAM) roles</p></td>
@@ -1276,18 +1155,18 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Network Load Balancers</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">3</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">2</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">c5 instances</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">4</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Aurora PostgreSQL</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aurora PostgreSQL–compatible edition</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Elastic Filesystem (EFS)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EFS file system</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">1</p></td>
 </tr>
 <tr>
@@ -1297,13 +1176,8 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </tbody>
 </table>
 </div>
-</div>
 <div class="sect3">
 <h4 id="_supported_regions">Supported Regions</h4>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/regions.adoc</code></strong></em></p>
-</div>
-<div id="preview_mode">
 <div class="paragraph">
 <p>This Quick Start supports the following Regions:</p>
 </div>
@@ -1359,7 +1233,6 @@ deploy, and operate your infrastructure and applications on the AWS Cloud.</p>
 </li>
 </ul>
 </div>
-</div>
 <div class="admonitionblock tip">
 <table>
 <tr>
@@ -1378,69 +1251,28 @@ Certain Regions are available on an opt-in basis. For more information, see <a h
 <div class="paragraph">
 <p>Before launching the Quick Start, you must sign in to the AWS Management Console with IAM permissions for the resources that the templates deploy. The <em>AdministratorAccess</em> managed policy within IAM provides sufficient permissions, although your organization may choose to use a custom policy with more restrictions. For more information, see <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_job-functions.html" target="_blank" rel="noopener">AWS managed policies for job functions</a>.</p>
 </div>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/pre-reqs.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="sect3">
-<h4 id="_prepare_your_aws_account">Prepare your AWS account</h4>
-<div class="paragraph">
-<p>The template will create a new VPC with a public and private subnet across two Availability Zones. A bastion host will be created in the public subnet which will allow you to run the HVR GUI for configuring the HVR software components (HVR Hub and Agent) in the private subnet.</p>
-</div>
-<div class="paragraph">
-<p>In preparation you will need to make sure you deploy the HVR configuration in a region close to your source from and/or destination into which you want to load data.</p>
-</div>
-<div class="paragraph">
-<p>This Quick Start deployment templates makes use of the HVR BYOL Marketplace AMI image. A Valid license key is required and as part of the deployment you will be asked for the AWS Secrets Manager Secret ARN which holds the license text. If you do not have a valid license please contact the HVR team using <a href="mailto:info@hvr-software.com">info@hvr-software.com</a>. Note that if you do not supply a license file and continue with a deployment, an empty Secrets Manager secret will be created and used. When you obtain your license please update this secret with the license details.
-To ensure High Availability for the HVR Hub configuration an EFS filesystem will be created as part of the quickstart deployment. This EFS filesystem will be mounted into the EC2 instance running as the HVR Hub.</p>
-</div>
-<div class="paragraph">
-<p>In addition to the above an Aurora PostgreSQL database will be created. This is optional, as you might already have a database available for use as the HVR Hub Database. Note the repository Database schema  should NOT be the same database schema you are using as a source or destination for your data replication.</p>
-</div>
 </div>
 <div class="sect3">
 <h4 id="_prepare_for_the_deployment">Prepare for the deployment</h4>
 <div class="paragraph">
-<p>To ensure secure communication between the HVR components (HVR Hub and Agents) a pair of public and private certificates is used. The template will provide a default set of keys which can be used. However, we recommend that these are only used for evaluation and that you generate your own keys - see the parameter section for HVRPubKeyBase64 and HVRPrivKeyBase64 parameters. These keys can be created using either openssl or using the HVR hvrsslgen utility. For more details, please see the HVR online <a href="https://www.hvr-software.com/docs/5" target="_blank" rel="noopener">documentation</a>.</p>
+<p>To help secure communication between the HVR components—the HVR hub and agents—this deployment uses a private key and public certificate pair. The template provides a default pair that you can use. (For the default values, see the <a href="#_parameter_reference">Parameter reference</a> section of this guide under the parameters <code>HVRPubKeyBase64</code> and <code>HVRPrivKeyBase64</code>.) Use the default pair for evaluation only; when you deploy this Quick Start, generate your own pair. You can create these keys (private key and public key) using either OpenSSL or the HVR the <strong>hvrsslgen</strong> command. For details, see the <a href="https://www.hvr-software.com/docs/5/commands/hvrsslgen" target="_blank" rel="noopener">HVR documentation</a>.</p>
 </div>
 <div class="paragraph">
-<p>A Secrets Manager Secret should be created prior to deploying this stack. This secret should be a text secret holding the full HVR License Key text. During the deployment you will be asked to provide the ARN for this secret.</p>
+<p>Also before you deploy this Quick Start, create a Secrets Manager secret. This is a text secret that holds the full HVR license key. During deployment, you are asked to provide the ARN for this secret.</p>
 </div>
-</div></div></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="sect3">
 <h4 id="_deployment_options">Deployment options</h4>
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deployment_options.adoc</code></strong></em></p>
-</div>
-<table class="tableblock frame-all grid-all stretch preview_mode">
-<colgroup>
-<col style="width: 100%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><div class="content"><div class="paragraph">
-<p>This Quick Start provides the following deployment option:</p>
+<p>This Quick Start provides a single deployment option:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><strong>Deploy HVR into a new VPC</strong>.
-This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys HVR into this new VPC.</p>
+<p><strong>Deploy HVR into a new VPC</strong>. This option builds a new AWS environment consisting of the VPC, subnets, NAT gateways, security groups, bastion hosts, and other infrastructure components. It then deploys HVR into this new VPC.</p>
 </li>
 </ul>
-</div></div></td>
-</tr>
-</tbody>
-</table>
+</div>
 </div>
 </div>
 </div>
@@ -1448,10 +1280,6 @@ This option builds a new AWS environment consisting of the VPC, subnets, NAT gat
 <div class="sect1">
 <h2 id="_deployment_steps">Deployment steps</h2>
 <div class="sectionbody">
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/deploy_steps.adoc</code></strong></em></p>
-</div>
-<div class="preview_mode">
 <div class="sect2">
 <h3 id="_sign_in_to_your_aws_account">Sign in to your AWS account</h3>
 <div class="olist arabic">
@@ -1468,7 +1296,7 @@ This option builds a new AWS environment consisting of the VPC, subnets, NAT gat
 <div class="sect2">
 <h3 id="_subscribe_to_the_hvr_ami">Subscribe to the HVR AMI</h3>
 <div class="paragraph">
-<p>This Quick Start requires a subscription to the AMI for HVR in AWS Marketplace.</p>
+<p>This Quick Start requires a subscription to the Bring Your Own License AMI for HVR in AWS Marketplace.</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -1476,11 +1304,13 @@ This option builds a new AWS environment consisting of the VPC, subnets, NAT gat
 <p>Sign in to your AWS account.</p>
 </li>
 <li>
-<p>Open the page for the <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" target="_blank" rel="noopener">HVR AMI in AWS Marketplace</a>, and then choose <strong>Continue to Subscribe</strong>.</p>
+<p>Open the page for the <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" target="_blank" rel="noopener">HVR BYOL AMI in AWS Marketplace</a>, and then choose <strong>Continue to Subscribe</strong>.</p>
 </li>
 <li>
-<p>Review the terms and conditions for software usage, and then choose <strong>Accept Terms</strong>.<br>
-A confirmation page loads, and an email confirmation is sent to the account owner. For detailed subscription instructions, see the <a href="https://aws.amazon.com/marketplace/help/200799470" target="_blank" rel="noopener">AWS Marketplace documentation</a>.</p>
+<p>Review the terms and conditions for software usage, and then choose <strong>Accept Terms</strong>.</p>
+<div class="paragraph">
+<p>A confirmation page loads, and an email confirmation is sent to the account owner. For detailed subscription instructions, see the <a href="https://aws.amazon.com/marketplace/help/200799470" target="_blank" rel="noopener">AWS Marketplace documentation</a>.</p>
+</div>
 </li>
 <li>
 <p>When the subscription process is complete, exit out of AWS Marketplace without further action. <strong>Do not</strong> provision the software from AWS Marketplace—the Quick Start deploys the AMI for you.</p>
@@ -1490,14 +1320,14 @@ A confirmation page loads, and an email confirmation is sent to the account owne
 </div>
 <div class="sect2">
 <h3 id="_launch_the_quick_start">Launch the Quick Start</h3>
-<div class="admonitionblock warning">
+<div class="admonitionblock note">
 <table>
 <tr>
 <td class="icon">
-<i class="fa icon-warning" title="Warning"></i>
+<i class="fa icon-note" title="Note"></i>
 </td>
 <td class="content">
-You are responsible for the cost of the AWS services used while running this Quick Start reference deployment.
+For efficiency, when you deploy this Quick Start, run your HVR environment in the same AWS Region and Availability Zone as the target database or service. Do not use the same repository database schema that you&#8217;re using as a source or destination for your data replication.
 </td>
 </tr>
 </table>
@@ -1508,55 +1338,45 @@ You are responsible for the cost of the AWS services used while running this Qui
 <div class="olist arabic">
 <ol class="arabic">
 <li>
-<p>Sign in to your AWS account, and choose one of the following options to launch the AWS CloudFormation template. For help with choosing an option, see <a href="#_deployment_options">Deployment options</a> earlier in this guide.</p>
+<p>Sign in to your AWS account, and <a href="https://fwd.aws/z8W3V?" target="_blank" rel="noopener">deploy HVR into a new VPC on AWS</a>. (<a href="https://fwd.aws/gXDvX?" target="_blank" rel="noopener">View the template</a>.)</p>
 </li>
-</ol>
-</div>
-<table class="tableblock frame-all grid-all stretch">
-<colgroup>
-<col style="width: 75%;">
-<col style="width: 25%;">
-</colgroup>
-<tbody>
-<tr>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_launch_permalink" target="_blank" rel="noopener">Deploy HVR into a new VPC on AWS</a></p></td>
-<td class="tableblock halign-center valign-top"><p class="tableblock"><a href="http://qs_template_permalink" target="_blank" rel="noopener">View template</a></p></td>
-</tr>
-</tbody>
-</table>
-<div class="olist arabic">
-<ol class="arabic" start="2">
 <li>
-<p>Check the AWS Region that’s displayed in the upper-right corner of the navigation bar, and change it if necessary. This Region is where the network infrastructure for HVR is built. The template is launched in the us-east-1 Region by default. For other choices, see <a href="#_supported_regions">Supported Regions</a> earlier in this guide.</p>
+<p>Check the AWS Region that&#8217;s displayed in the upper-right corner of the navigation bar, and change it if necessary. This Region is where the network infrastructure for HVR is built. To maximize efficiency, choose the same AWS Region as the target database or service. The template is launched in the us-east-1 Region by default. For other choices, see <a href="#_supported_regions">Supported Regions</a> earlier in this guide.</p>
 </li>
-</ol>
-</div>
-<div class="olist arabic">
-<ol class="arabic" start="3">
 <li>
 <p>On the <strong>Create stack</strong> page, keep the default setting for the template URL, and then choose <strong>Next</strong>.</p>
 </li>
 <li>
 <p>On the <strong>Specify stack details</strong> page, change the stack name if needed. Review the parameters for the template. Provide values for the parameters that require input. For all other parameters, review the default settings and customize them as necessary. For details on each parameter, see the <a href="#_parameter_reference">Parameter reference</a> section of this guide. When you finish reviewing and customizing the parameters, choose <strong>Next</strong>.</p>
 </li>
+<li>
+<p>On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.</p>
+</li>
+<li>
+<p>On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.</p>
+</li>
+<li>
+<p>Choose <strong>Create stack</strong> to deploy the stack.</p>
+</li>
+<li>
+<p>Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the HVR deployment is ready.</p>
+</li>
+<li>
+<p>To view the created resources, see the values displayed in the <strong>Outputs</strong> tab for the stack.</p>
+</li>
 </ol>
 </div>
 </div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_getting_started">Getting started</h2>
+<div class="sectionbody">
 <div class="paragraph">
-<p>+</p>
+<p>When you log in to the bastion host, HVR hub, or HVR agent, you see a message on using the images. Review the message. Also read the readme file located in the HVR Linux user home directory: <strong>/home/hvr/hvr-readme.txt</strong>.</p>
 </div>
 <div class="paragraph">
-<p>+
-. On the <strong>Configure stack options</strong> page, you can <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-properties-resource-tags.html" target="_blank" rel="noopener">specify tags</a> (key-value pairs) for resources in your stack and <a href="https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-console-add-tags.html" target="_blank" rel="noopener">set advanced options</a>. When you’re finished, choose <strong>Next</strong>.
-. On the <strong>Review</strong> page, review and confirm the template settings. Under <strong>Capabilities</strong>, select the two check boxes to acknowledge that the template creates IAM resources and might require the ability to automatically expand macros.
-. Choose <strong>Create stack</strong> to deploy the stack.
-. Monitor the status of the stack. When the status is <strong>CREATE_COMPLETE</strong>, the HVR deployment is ready.
-. To view the created resources, see the values displayed in the <strong>Outputs</strong> tab for the stack.</p>
-</div>
-<div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/additional_info.adoc</code></strong></em></p>
-</div>
-<div class="preview_mode">
+<p>To start the HVR graphical user interface on the bastion host, connect to the host by using SSH with your supplied key pair. Connect as the HVR Unix user: <code>sudo su - hvr</code>. Then run <code>hvrwebdesktop</code>, and follow the instructions.</p>
 </div>
 </div>
 </div>
@@ -1564,28 +1384,57 @@ You are responsible for the cost of the AWS services used while running this Qui
 <h2 id="_other_useful_information">Other useful information</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>For more detail on HVR Software, including documentation and whitepapers please see the following links</p>
+<p>Restricted port access:</p>
 </div>
 <div class="ulist">
 <ul>
 <li>
-<p><a href="https://www.hvr-software.com/" target="_blank" rel="noopener">HVR Software Website</a></p>
+<p>Port 22 and 8080 is open for connections to the bastion host.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Port 22 is used for SSH access. A valid key pair is required to access the host.</p>
 </li>
 <li>
-<p><a href="https://www.hvr-software.com/solutions/aws-data-integration-hybrid-cloud/" target="_blank" rel="noopener">HVR Software and AWS</a></p>
+<p>Port 8080 can be used to access the HVR web desktop to establish a remote connection to the HVR hub for configuration.</p>
+</li>
+</ul>
+</div>
 </li>
 <li>
-<p><a href="https://www.hvr-software.com/docs/5" target="_blank" rel="noopener">HVR Online Documentation</a></p>
+<p>Outbound traffic is limited to ports 22, 8080, 4343, and 443.</p>
+<div class="ulist">
+<ul>
+<li>
+<p>The HVR hub and agents are behind Network Load Balancers using port 4343 for HVR communication.</p>
 </li>
 <li>
-<p><a href="https://www.hvr-software.com/resources/whitepapers/" target="_blank" rel="noopener">Whitepapers</a></p>
+<p>The bastion host can connect to the hub and agents using port 4343 and 22 (SSH). SSH requires the specified key pair.</p>
+</li>
+</ul>
+</div>
 </li>
 </ul>
 </div>
 <div class="paragraph">
-<p><em><strong>This portion of the deployment guide is located at <code>docs/partner_editable/faq_troubleshooting.adoc</code></strong></em></p>
+<p>For additional information about HVR and using the HVR Software:</p>
 </div>
-<div class="preview_mode">
+<div class="ulist">
+<ul>
+<li>
+<p><a href="https://www.hvr-software.com/" target="_blank" rel="noopener">HVR Software</a></p>
+</li>
+<li>
+<p>HVR and <a href="https://www.hvr-software.com/solutions/aws-data-integration-hybrid-cloud/" target="_blank" rel="noopener">AWS Data Integration</a></p>
+</li>
+<li>
+<p><a href="https://www.hvr-software.com/docs/5" target="_blank" rel="noopener">HVR Documentation</a></p>
+</li>
+<li>
+<p><a href="https://www.hvr-software.com/resources/whitepapers/" target="_blank" rel="noopener">HVR Whitepapers</a></p>
+</li>
+</ul>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -1595,7 +1444,7 @@ You are responsible for the cost of the AWS services used while running this Qui
 <p><strong>Q.</strong> I encountered a <strong>CREATE_FAILED</strong> error when I launched the Quick Start.</p>
 </div>
 <div class="paragraph">
-<p><strong>A.</strong> If AWS CloudFormation fails to create the stack, relaunch the template with <strong>Rollback on failure</strong> set to <strong>Disabled</strong>. This setting is under <strong>Advanced</strong> in the AWS CloudFormation console on the <strong>Configure stack options</strong> page. With this setting, the stack’s state is retained, and the instance keeps running so that you can troubleshoot the issue.</p>
+<p><strong>A.</strong> If AWS CloudFormation fails to create the stack, relaunch the template with <strong>Rollback on failure</strong> set to <strong>Disabled</strong>. This setting is under <strong>Advanced</strong> in the AWS CloudFormation console on the <strong>Configure stack options</strong> page. With this setting, the stack&#8217;s state is retained, and the instance keeps running so that you can troubleshoot the issue.</p>
 </div>
 <div class="admonitionblock warning">
 <table>
@@ -1621,14 +1470,10 @@ When you set <strong>Rollback on failure</strong> to <strong>Disabled</strong>, 
 </div>
 </div>
 <div class="sect1">
-<h2 id="_troubleshooting">Troubleshooting</h2>
+<h2 id="_customer_responsibility">Customer responsibility</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>When logging into the Bastion Host, HVR Hub or Agent, you will be presented with a description on using the images in the "Message of the Day" (MOTD). It is highly recommended to review the information supplied as well as the additional readme file located under the "hvr" Linux user home folder - /home/hvr/hvr-readme.txt</p>
-</div>
-<div class="paragraph">
-<p>To start the HVR GUI on the Bastion Host, you will need to SSH into the host using your supplied keypair and connect as the "hvr" unix user using "sudo su - hvr". Once connect run "hvrwebdesktop" and follow the instructions.</p>
-</div>
+<p>After you successfully deploy this Quick Start, confirm that your resources and services are updated and configured — including any required patches — to meet your security and other needs. For more information, see the <a href="https://aws.amazon.com/compliance/shared-responsibility-model/" target="_blank" rel="noopener">AWS Shared Responsibility Model</a>.</p>
 </div>
 </div>
 </div>
@@ -1648,9 +1493,9 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </table>
 </div>
 <div class="sect2">
-<h3 id="_launch_into_a_new_vpc">Launch into a new VPC</h3>
+<h3 id="_parameters_for_deploying_into_a_new_vpc">Parameters for deploying into a new VPC</h3>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 1. End User License Agreement (EULA) - HVR CDC</caption>
+<caption class="title">Table 1. End-user license agreement (EULA) for HVR CDC</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1665,10 +1510,10 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accepted EULA from AWS Marketplace
+<td class="tableblock halign-left valign-top"><p class="tableblock">Accepted EULA
 (<code>AcceptedEULA</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>yes</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PLEASE READ THE HVR SOFTWARE LICENSE AGREEMENT (<a href="https://www.hvr-software.com/license-agreement/" class="bare">https://www.hvr-software.com/license-agreement/</a>) CAREFULLY BEFORE USING THE SOFTWARE. The HVR stack can be created only if you have already accepted the EULA. To accept the EULA, see <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" class="bare">https://aws.amazon.com/marketplace/pp/B077YM8HPW</a>.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Read the HVR Software end-user license agreement (<a href="https://www.hvr-software.com/license-agreement/" class="bare">https://www.hvr-software.com/license-agreement/</a>) carefully before using the software. The HVR stack can be created only after you accept the EULA. To accept the EULA from AWS Marketplace, see <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" class="bare">https://aws.amazon.com/marketplace/pp/B077YM8HPW</a>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1691,48 +1536,48 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 <td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones
 (<code>AvailabilityZones</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">List of Availability Zones to use for the subnets in the VPC. Only two Availability Zones are used for this deployment, and the logical order of your selections is preserved.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Availability Zones to use for the subnets in the VPC. Two Availability Zones are used for this deployment, and the logical order of your selections is preserved. To maximize efficiency, choose the same Availability Zone as the target database or service.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the VPC
+<td class="tableblock halign-left valign-top"><p class="tableblock">VPC CIDR
 (<code>VPCCIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/16</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public CIDR Block AZ 1
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 1 CIDR
 (<code>PublicSubnet1CIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.128.0/20</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public subnet 1 located in Availability Zone 1 - The Bastion host will be deployed here.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for public subnet 1 located in Availability Zone 1. The bastion host is deployed here.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Public CIDR Block AZ 2
+<td class="tableblock halign-left valign-top"><p class="tableblock">Public subnet 2 CIDR
 (<code>PublicSubnet2CIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.144.0/20</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the public subnet 1 located in Availability Zone 2 - The Bastion host will be deployed here.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for public subnet 2 located in Availability Zone 2. The bastion host is deployed here.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private CIDR Block AZ 1
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 1 CIDR
 (<code>PrivateSubnet1CIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/19</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 located in Availability Zone 1 - HVR Hub, Agent and Aurora/Postgress DB will be deployed here.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 1 located in Availability Zone 1. The HVR hub, agent, and Aurora/PostgreSQL database are deployed here.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private CIDR Block AZ 2
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 2 CIDR
 (<code>PrivateSubnet2CIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.32.0/19</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 located in Availability Zone 2 - HVR Hub, Agent and Aurora/Postgress DB will be deployed here.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for private subnet 2 located in Availability Zone 2. The HVR hub, agent, and Aurora/PostgreSQL database are deployed here.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed CIDR to Bastion Host
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed CIDR to bastion host
 (<code>RemoteAccessCIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The CIDR address from which you will connect to the Bastion Host.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR address from which you will connect to the bastion host.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 3. HVR EC2 Configuration</caption>
+<caption class="title">Table 3. HVR EC2 configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1747,22 +1592,22 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR HUB
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type for HVR hub
 (<code>HVRInstanceTypeHUB</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type - for HVR HUB</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type for the HVR hub.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR Agent
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type for HVR agent
 (<code>HVRInstanceTypeAgent</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type - for HVR Agent running Capture/Integrate</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 instance type for the HVR agent running capture/integrate.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Key pair name
+<td class="tableblock halign-left valign-top"><p class="tableblock">EC2 key pair name
 (<code>KeyName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of an existing EC2 KeyPair to enable SSH access to the instance</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the key pair to be used to connect to your EC2 instances by using SSH.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1782,7 +1627,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Environment Tag
+<td class="tableblock halign-left valign-top"><p class="tableblock">Environment tag
 (<code>TagEnvironment</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>dev</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Designates the environment stage of the associated AWS resource.</p></td>
@@ -1790,7 +1635,7 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 5. HVR License Key (Secret Parameter ARN)</caption>
+<caption class="title">Table 5. HVR license key (secret parameter ARN)</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1805,12 +1650,12 @@ Unless you are customizing the Quick Start templates for your own deployment pro
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR License Key (Secret ARN)
+<td class="tableblock halign-left valign-top"><p class="tableblock">HVR license key
 (<code>HVRLicenseSecret</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
-If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
-If you require a license please contact the HVR Software sales team and leave the value as "none".</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Specify the ARN to the secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
+If no value is specified, a temporary dummy secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
+If you require a license, leave the value as "none," and contact the HVR Software sales team.</p></td>
 </tr>
 </tbody>
 </table>
@@ -1830,33 +1675,33 @@ If you require a license please contact the HVR Software sales team and leave th
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Do you want to create Aurora Postgres stack?
+<td class="tableblock halign-left valign-top"><p class="tableblock">Enable Aurora/PostgreSQL stack
 (<code>EnablePGStack</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>true</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Enables or disables creation of an Amazon Aurora Postgresql RDS stack. If true, an Amazon Aurora Postgresql RDS stack will be created.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Choose "false" if you don&#8217;t want to create an Amazon Aurora/PostgreSQL RDS stack.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed CIDR that will have DB access
+<td class="tableblock halign-left valign-top"><p class="tableblock">Allowed CIDR for database access
 (<code>DBAccessCIDR</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/18</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Private CIDR address from which you will connect to the DB Instance.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Private CIDR address from which you will connect to the database instance.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Aurora/PostgreSQL instance class
 (<code>PGInstanceClass</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>db.r5.large</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The Aurora/PostgreSQL database instance class.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Aurora/PostgreSQL database instance class.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">SNS notification email for Aurora/PostgreSQL notifications
+<td class="tableblock halign-left valign-top"><p class="tableblock">Email address for Aurora/PostgreSQL notifications
 (<code>NotificationList</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ops@company.com</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The email notification that is used to configure an SNS topic for sending an Amazon CloudWatch alarm and Amazon RDS event notifications.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Email notification that is used to configure an SNS topic for sending an Amazon CloudWatch alarm and Amazon RDS event notifications.</p></td>
 </tr>
 </tbody>
 </table>
 <table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 7. AWS Quick Start configuration S3 Bucket/Prefix</caption>
+<caption class="title">Table 7. AWS Quick Start configuration</caption>
 <colgroup>
 <col style="width: 16%;">
 <col style="width: 11%;">
@@ -1871,268 +1716,22 @@ If you require a license please contact the HVR Software sales team and leave th
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">S3 Region for S3 Bucket
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket Region
 (<code>QSS3BucketRegion</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ap-southeast-2</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. When using your own bucket, you must specify this value.</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">AWS Region where the Quick Start S3 bucket (QSS3BucketName) is hosted. Keep the default Region unless you are customizing the template. Changing this Region updates code references to point to a new Quick Start location. When using your own bucket, specify the Region. See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 bucket name
 (<code>QSS3BucketName</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>ae-quickstart-aws-hvr</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The S3 bucket name for the Quick Start assets. The Quick Start bucket name can include numbers, lowercase letters, uppercase letters, and hyphens (-). It cannot start or end with a hyphen (-).</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Name of the S3 bucket for your copy of the Quick Start assets. Keep the default name unless you are customizing the template. Changing the name updates code references to point to a new Quick Start location. This name can include numbers, lowercase letters, uppercase letters, and hyphens, but do not start or end with a hyphen (-). See <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 Key prefix
+<td class="tableblock halign-left valign-top"><p class="tableblock">Quick Start S3 key prefix
 (<code>QSS3KeyPrefix</code>)</p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>quickstart-hvr/</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The S3 key prefix for the Quick Start assets. The Quick Start key prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slash (/).</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="sect2">
-<h3 id="_launch_into_an_existing_vpc">Launch into an existing VPC</h3>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 8. End User License Agreement (EULA) - HVR CDC</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Accepted EULA from AWS Marketplace
-(<code>AcceptedEULA</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>yes</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">PLEASE READ THE HVR SOFTWARE LICENSE AGREEMENT (<a href="https://www.hvr-software.com/license-agreement/" class="bare">https://www.hvr-software.com/license-agreement/</a>) CAREFULLY BEFORE USING THE SOFTWARE. The HVR stack can be created only if you have already accepted the EULA. To accept the EULA, see <a href="https://aws.amazon.com/marketplace/pp/B077YM8HPW" class="bare">https://aws.amazon.com/marketplace/pp/B077YM8HPW</a>.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 9. VPC network configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VPCID ID
-(<code>VPCID</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The ID of the existing VPC that contains the subnets.</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR Block for the VPC
-(<code>VPCCIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>10.0.0.0/16</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">CIDR block for the VPC</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 1 ID
-(<code>PrivateSubnet1</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An existing private subnet 1 to launch secondary resources (e.g. PostgresSQL database).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private subnet 2 ID
-(<code>PrivateSubnet2</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">An existing private subnet 2 to launch secondary resources (e.g. PostgresSQL database).</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 1 (AZ1) CIDR Range
-(<code>PrivateSubnet1CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VPC Stack Shared CIDR block for the private subnet 1 located in Availability Zone 1</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Private Subnet 2 (AZ2) CIDR Range
-(<code>PrivateSubnet2CIDR</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">VPC Stack Shared CIDR block for the private subnet 2 located in Availability Zone 2</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 10. HVR EC2 Configuration</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR HUB
-(<code>HVRInstanceTypeHUB</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">General Purpose EC2 instance - Recommended for HUB only Instances</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR EC2 instance type for HVR Agent
-(<code>HVRInstanceTypeAgent</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>c5.large</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Compute Based EC2 instance - Recommended for Agent instances running Capture/Integrate</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Key pair name
-(<code>KeyName</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code><strong><em>Requires input</em></strong></code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Name of an existing EC2 KeyPair to enable SSH access to the instance</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 11. Tag identifiers</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Environment
-(<code>TagEnvironment</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>dev</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Designates the environment stage of the associated AWS resource.</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 12. Public and Private keys for HVR communication</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR Public Key (base64)
-(<code>HVRPubKeyBase64</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">`LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM5RENDQWR5Z0F3SUJBd0lCQURBTkJna3Fo
-a2lHOXcwQkFRc0ZBREFvTVFzd0NRWURWUVFHRXdKT1RERVoKTUJjR0ExVUVBd3dRU0ZaU0lFVjRZ
-VzF3YkdVZ1MyVjVjekFlRncweU1ERXlNekV3TURVek1qSmFGdzAwTURFeQpNall3TURVek1qSmFN
-Q2d4Q3pBSkJnTlZCQVlUQWs1TU1Sa3dGd1lEVlFRRERCQklWbElnUlhoaGJYQnNaU0JMClpYbHpN
-SUlCSURBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVEwQU1JSUJDQUtDQVFFQXB4Q1hVUFN6cUJlVys5
-ZFoKbkFTNndQRXJPWVZSYkxhRStleTZUTW84bWUzTldzY044aW1TQktjYnViVFA2ajFUNEd1VzhS
-QVlaK3pJZGh4TQpRZmswYzRqMUR0NElPRll5UURIOFdHLzlxU3Rmc1psNjJOV2FwNXhDNWxFU0Mx
-MmQ1dkRqOUp3LzRlV29oU3J4CnBsY3EveVh6SWNoVWdyaWkxbExKSlFEMHUyTWxDQmN3ZjVVQkIv
-ZWFHa1U4SGZLMHU3MHhWcmtOYnJqYTRweSsKZFNJOS85VnFMWnpRNWZ1aGNhb1Q0WU9WbGpaUUpq
-UTN1clpaTVVtUnRybWl1SEVpdGtqa3NTeXNkZDdaODI1LwpoNWI3bkMzdlJ0VTExVnk3N3VtT0FB
-d2htbXJ3bitXb2JqZ0ZyenlvYWVwOVphV1dZY09mMTFKYUlnYk1WdUY1CklKTEUxd0lCQTZNck1D
-a3dKd1lKWUlaSUFZYjRRZ0VOQkJvV0dFZGxibVZ5WVhSbFpDQmllU0JJVmxJZ05TNDMKTGpBdk9E
-QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFhckVVYjNxeUcya0dYM1VMNXJHSlo3eW1kTktUMTls
-eQpLWnBLeWVCMjcvU1hPWVg3RDBITWNESlhlSk9vaGkvcmRBdGR2dXBiU3ZLK1dqSVR6amlSZ0Nw
-em05ZmNyTlFyCi81RzdONVdKSDJOK3I4cStuZGNaVnhZTytBaHA0djBkVXdDcGlUeVI1dUhWZ1g1
-VlpWSyttSFZjTllxalgxaG4KTUVqeW1yUVRwUHdWeEpSY2FKaE9peC9wcThadStmZzRqQ3FrNC9D
-OTQzMjVPQnZ0ZEhXMkZ6UGZ4TERPM1pUSgpmVE5pTnV0VEM1MDMxZEc0SEJGWGtWdnAxenk3bDRx
-U2ZVWG1YR0dSMkNETlhYaDVHeVJpWlpFQUlpSHBoR21LClMyUHZlREJPN1B1RDdCcWpqK1BkcE5x
-UFdzVTN5M3dabHZhcjBkT3NKYWZXSmlYb2x0ay9wZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0t
-LS0K
-`</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.
-A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert | base64"</p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR Private Key (base64)
-(<code>HVRPrivKeyBase64</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">`LS0tLS1CRUdJTiBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLQpNSUlGTFRCWEJna3Foa2lHOXcw
-QkJRMHdTakFwQmdrcWhraUc5dzBCQlF3d0hBUUlDenVUbmhMbDBZOENBZ2dBCk1Bd0dDQ3FHU0li
-M0RRSUpCUUF3SFFZSllJWklBV1VEQkFFcUJCREhldVlYMUU2QitxbE52U1M3VTJMbkJJSUUKMEVl
-aGlVekI0SWUzZWhObnVCWHU5UERmUHZEdFdBcTk5OHlud1M2dTMrSEZJNEhnbkJCQ01KaVllL09w
-QUI1RgpkQnI0K0NsM1R3VkFENlVJNzkyOXpLVmUxT3lsV0ROUlZNdzF3VVlNUFZVQURNZEFscVRa
-L2FWZS9NT3A1Qk5hClJZQVV4WkFuTWg0eStyK3U2aWRYZW1wK2hOckJHUVNLeEFPbnNIbVkzQ3pu
-K01maUxxajRaeThlU0FmbWlFSksKODQwSStQWGtNNG84c2ZNWHAzeEpWY0RxTjBsZ1Aya2JYK0l4
-RmdrdzhrQWFoZEJFcDBxSVhKSUtZQ1JUZC9BLwo5TGV6bldYQzFkU0gwRGNlaTRUaVUvMEc1NHgz
-ODg1MDNJZmV6QUE3TWkxNHpqSWlEckg5TnA0MFMxbDFDOThBCnFXT0FuL2ZzQjFRRmo5S0NUMVdM
-Wmx1TDJ3NHc2SzZGR2ZkVlB4bFN4RnlVRGxXTEZDeWo4NVI5MWcxdWxGRFEKcHZ5VE5IV3ZRTzFH
-S0FkR0dkc3VTUnlXOGVJYnlkUTJlNmZaKzJTM3ZibGVMTTdwdUU0aktEcFVCbHpaaUI2bQp6QzRU
-Mm85a0k0TTVwU0tRYnQ2bFdwNTZnRkMwWmdnaTFiVXFTSDU5RHRKVjcvcmVBdngxcDhvZkpVbUs4
-eWhPClRyaTJKYXpzZHBVRVByVitmUHdycXJ2dG4yRUhXVmNqamFiODdLaDFvYmpGZUZ1czBRRE5O
-aTFsYmYwVlZkZ0EKN2JQVWxXY3BJcndwd09LKzBUZXNBemtlNnREMmhPTi92REJ3S2hwZkd1TFU1
-ZEh1VlFLUmdoUk80d1dlanUxRQp2eS9tcWkwbG9DUE95bUFwQ2FVcnd6MmZBbVI0T1d0b0t1Tjli
-NHhRSTk0dEt2aDk1VGgwN0NyS2k5SUcyZWN5CjJhb1FpRmM2T2hZMndiMHdzUVM1blZId3Q4WCtp
-SHpJdkJCU3BvaG9xb29pREhUR1k3ODRrN0E4ZVhmQ2o0dkwKUWZnamJ0eWYwOGh1NGpuYXg3TFFy
-b0hYL0pYUGFHd1Y4Uk03NjZoRTl4bUF6bmhDWDI5M0lrK05CVWRkYkxFNQpnSU1HWUIzejZ3ekI4
-b3E5S3lZdVMwbHkweE1MbzBzTVhNTTExR1RDL0Vaem1abm5SMXFGNUZBTCtnckJXV3BCCkQ5Mml6
-RElZZmRNYllnbk9vb2RVS2pXSnZyRWZaQUxMWUFJOENaVTJMeHpBRkpPWWpJenR5L2dKNU9vOG1E
-R3EKU0dlbnBmMXlhUFhpalhUSEJNN3JnNDhoZWl1UGUvbEZ0bmM3bFZkdjR0cEFSaCs2bEJ4alNl
-R1JQU2lVdG1yUQo0NUNpYTQwaVFEOTZadHc3dGxsNEN1U0I1WTdDVy8wQzVmSFAvdWNTMERWMU9a
-b3h3R1hmcGdzSnJPM1pDUG1JCkJBbm8xT3JKeWlidHp6ZGppTFBrUkdPZTJJcWlNL25pQUtsZ1pq
-Q3g2aFZjQzhldlV6RzhiWUREb0o3OGpsRXQKRG9XY2VqY1JXS3NiaUJQbi9UQWd5UTJRUFJMYkY4
-V0hxUisweTllK2J0UlpHVXB2aEExMWdOVUVianJTTTE2VwpkazZ1TUtwRUpVeHVrOVp6QjdVSjV6
-Qi9UcUhiaUVqM1NDRUdVbzNDMGQ4bW5DVmw4cEZ0OExHaGFDNnV0TWJYCll2Y2JFQ0pySUI2VkVn
-Z0sxd0FDWlZVdXVFRFF0M2tDbFZsaG5xa1phbmpoSW82TkI0M1c0a1BHRmxWQ2hJTmUKdXZhSzBq
-bnVkNzU5NHFub0NOOFlSUm5UYUJpT3lBdnpHb3owemlnR1ZRRG55VndqV1oySnZEOTlvNE9iMkhV
-OQpEVDVhMHRyclM4S1cvcUdqZ2dwYXVPZ0dmUVJBY2doVExpVTBFZnVoN1l1WTlmZFBYR3FLRkhQ
-MUttSmp4VDMyCjFtT3pzSjZLcWJRR0xsWVMwdGxlN0dNcS9KbEVlOHFaRFlKMWwyWHBkaThiLy9w
-L3JOZE5lbWZ6Q0VlZnhLSTIKUkN3WFhLeDBuOHNBakc4Y2JmQVJ5eERSK1hoYU1tUTdDeXFiNDJU
-TzdHOEdlK2VMSEhLWnFSWFlEengzaWxsWAoraGNpd005dXNyZ215bFpJcXZkWjdZS2dNNkFVTURY
-bDNHYms2N3RzT0l2LwotLS0tLUVORCBFTkNSWVBURUQgUFJJVkFURSBLRVktLS0tLQo=
-`</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Specify HVR private key (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.
-A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert | base64"</p></td>
-</tr>
-</tbody>
-</table>
-<table class="tableblock frame-all grid-all stretch">
-<caption class="title">Table 13. Secrets Manager ARN for HVR License Key secret</caption>
-<colgroup>
-<col style="width: 16%;">
-<col style="width: 11%;">
-<col style="width: 73%;">
-</colgroup>
-<thead>
-<tr>
-<th class="tableblock halign-left valign-top">Parameter label (name)</th>
-<th class="tableblock halign-left valign-top">Default value</th>
-<th class="tableblock halign-left valign-top">Description</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock">HVR License Key (Secret ARN)
-(<code>HVRLicenseSecret</code>)</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>none</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
-If no value is specified a temporary dummy Secret will be created in Secrets Manager as hvr/quickstart/{TagEnvironment}/hvrlic.
-If you require a license please contact the HVR Software sales team and leave the value as "none".</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">S3 key prefix that is used to simulate a directory for your copy of the Quick Start assets. Keep the default prefix unless you are customizing the template. Changing this prefix updates code references to point to a new Quick Start location. This prefix can include numbers, lowercase letters, uppercase letters, hyphens (-), and forward slashes (/). End with a forward slash. See <a href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html" class="bare">https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingMetadata.html</a> and <a href="https://aws-quickstart.github.io/option1.html" class="bare">https://aws-quickstart.github.io/option1.html</a>.</p></td>
 </tr>
 </tbody>
 </table>

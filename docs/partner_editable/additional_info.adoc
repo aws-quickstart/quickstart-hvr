@@ -27,12 +27,22 @@ To start the HVR graphical user interface on the bastion host, connect to the ho
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
 Restricted port access:
 
-* Inbound ports 22 and 8080 are open for connections to the bastion host.
-** Port 22 is used for SSH access. A valid key pair is required to access the host.
-** Port 8080 can be used to access the HVR web desktop to establish a remote connection to the HVR hub for configuration.
-* Outbound traffic is limited to ports 22, 8080, 4343, and 443.
-** The HVR hub and agents are behind Network Load Balancers using port 4343 for HVR communication.
-** The bastion host can connect to the hub and agents using port 4343 and 22 (SSH). SSH requires the specified key pair.
+* In the public subnets:
+** Inbound ports 22 and 8080 are open for connections to the bastion host.
+*** Port 22 is used for SSH access. A valid key pair is required to access the host.
+*** Port 8080 can be used to access the HVR web desktop to establish a remote connection to the HVR hub for configuration.
+** Outbound traffic is limited to ports 22, 8080, 4343, and 443.
+*** The HVR hub and agents are behind Network Load Balancers using port 4343 for HVR communication.
+*** The bastion host can connect to the hub and agents using port 4343 and 22 (SSH). SSH requires the specified key pair.
+* In the private subnets:
+**  Inbound ports 4343, 22 and 2049
+*** Port 4242 is used for HVR communication
+*** Port 22 is used for SSH access. A valid key pair is required to access the host.
+*** Port 2049 is used for Amazon Elastic File System (Amazon EFS)
+** Outbound traffic is not limited
+
+
+
 
 For additional information about HVR and using the HVR Software:
 

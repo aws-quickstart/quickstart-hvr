@@ -1058,7 +1058,7 @@ After you deploy the Quick Start, create <a href="https://docs.aws.amazon.com/aw
 <p>Two Linux-based HVR agent instances in an Auto Scaling group, one instance in each private subnet. These instances, which are based on the HVR BYOL AMI, are close to replication endpoints.</p>
 </li>
 <li>
-<p>A security group for limiting inbound traffic to ports 4343 (HVR), 22 (SSH), 2049 (Amazon Elastic File System [Amazon EFS]). Outbound traffic is not limited.</p>
+<p>A security group for limiting inbound traffic, outbound traffic is not limited.</p>
 </li>
 </ul>
 </div>
@@ -1389,7 +1389,11 @@ For efficiency, when you deploy this Quick Start, run your HVR environment in th
 <div class="ulist">
 <ul>
 <li>
-<p>Port 22 and 8080 is open for connections to the bastion host.</p>
+<p>In the public subnets:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Inbound ports 22 and 8080 are open for connections to the bastion host.</p>
 <div class="ulist">
 <ul>
 <li>
@@ -1410,6 +1414,35 @@ For efficiency, when you deploy this Quick Start, run your HVR environment in th
 </li>
 <li>
 <p>The bastion host can connect to the hub and agents using port 4343 and 22 (SSH). SSH requires the specified key pair.</p>
+</li>
+</ul>
+</div>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>In the private subnets:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Inbound ports 4343, 22 and 2049</p>
+<div class="ulist">
+<ul>
+<li>
+<p>Port 4242 is used for HVR communication</p>
+</li>
+<li>
+<p>Port 22 is used for SSH access. A valid key pair is required to access the host.</p>
+</li>
+<li>
+<p>Port 2049 is used for Amazon Elastic File System (Amazon EFS)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Outbound traffic is not limited</p>
 </li>
 </ul>
 </div>

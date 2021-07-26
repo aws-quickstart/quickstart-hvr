@@ -136,7 +136,7 @@ Parameters:
         t3.large,
         c5.large,
         c5.xlarge,
-        c5.2xlarge
+        c5.2xlarge,
         c5d.large,
         c5d.xlarge,
         c5d.2xlarge
@@ -154,7 +154,7 @@ Parameters:
         t3.large,
         c5.large,
         c5.xlarge,
-        c5.2xlarge
+        c5.2xlarge,
         c5d.large,
         c5d.xlarge,
         c5d.2xlarge
@@ -288,39 +288,39 @@ Conditions:
 Mappings:
   RegionMap:
     eu-north-1:
-      AMI: ami-0220c0c08d6ebf5e8
+      AMI: ami-09c028d029aa47c59
     ap-south-1:
-      AMI: ami-0aec7e99e59843058
+      AMI: ami-05b45cb4d48b27c2c
     eu-west-3:
-      AMI: ami-02a90529e3954c1ca
+      AMI: ami-0d5190aced2bf17ec
     eu-west-2:
-      AMI: ami-07f7e5cf369953bf3
+      AMI: ami-04cf781936ce8f63d
     eu-west-1:
-      AMI: ami-05a15301ffee1f68d
+      AMI: ami-0e8d392b3ddf9659b
     ap-northeast-3:
-      AMI: ami-079c51d32043715a0
+      AMI: ami-0e7913085a4c9b509
     ap-northeast-2:
-      AMI: ami-0252c9b13e7ccaac9
+      AMI: ami-0c0bae7a0dd8a5098
     ap-northeast-1:
-      AMI: ami-0f6ebae8c0c309639
+      AMI: ami-07d5ef58b1dbfdbeb
     sa-east-1:
-      AMI: ami-0a34968d8292ce9f7
+      AMI: ami-02654fc04ad5454e5
     ca-central-1:
-      AMI: ami-015d2e46d63118878
+      AMI: ami-049d7a3dfd3295ac1
     ap-southeast-1:
-      AMI: ami-01048650a03e0ebbd
+      AMI: ami-0a23712d215e8963d
     ap-southeast-2:
-      AMI: ami-04df8d21db94207c4
+      AMI: ami-01e9fcbbfa56e4c60
     eu-central-1:
-      AMI: ami-0008de55175eca447
+      AMI: ami-0a302ce05f1f03bc5
     us-east-1:
-      AMI: ami-0e1dfff22cdac3a13
+      AMI: ami-05ceb67c8f00b6ae4
     us-east-2:
-      AMI: ami-0200d7e7c1b7ac5d1
+      AMI: ami-0ed20b612db8061af
     us-west-1:
-      AMI: ami-01834975409566f89
+      AMI: ami-02dbdb6715defb628
     us-west-2:
-      AMI: ami-0665273102b9bf5c0
+      AMI: ami-0ed596901365f3378
 
 
 ######################################

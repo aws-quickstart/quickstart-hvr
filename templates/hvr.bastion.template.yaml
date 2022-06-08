@@ -41,10 +41,6 @@ Metadata:
           default: Tag identifiers
         Parameters:
           - TagEnvironment
-      - Label:
-          default: Public key for HVR communication
-        Parameters:
-          - HVRPubKeyBase64
 
     ParameterLabels:
       AcceptedEULA:
@@ -65,8 +61,6 @@ Metadata:
         default: Key pair name
       TagEnvironment:
         default: Environment Tag
-      HVRPubKeyBase64:
-        default: HVR Public Key (base64)
 
   License: Apache-2.0
 
@@ -137,38 +131,6 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: must be the name of an existing EC2 KeyPair.
 
-  # The HVR Public key to allow secure communication. This is set as a parameter, and will be obtained from the HVR Stack output
-  # The HVRPubKeyBase64 value must be a Base64 encoded public key - see the HVRStack
-  HVRPubKeyBase64:
-    Description: |
-      Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication with the HVR Hub
-      The default location is /opt/hvr/hvr_home/lib/cert and the file name used in this example is qshvr.pub_cert.
-      A method to get this string from your public certificate, is using the base64 utility, example: "cat qshvr.pub_cert \| base64"
-      The Quickstart does provide a sample default set of private/public keys (see hvrhub stack template) - this should be changed for production systems.
-    Type: String
-    NoEcho: true
-    Default: |
-      LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM5RENDQWR5Z0F3SUJBd0lCQURBTkJna3Fo
-      a2lHOXcwQkFRc0ZBREFvTVFzd0NRWURWUVFHRXdKT1RERVoKTUJjR0ExVUVBd3dRU0ZaU0lFVjRZ
-      VzF3YkdVZ1MyVjVjekFlRncweU1ERXlNekV3TURVek1qSmFGdzAwTURFeQpNall3TURVek1qSmFN
-      Q2d4Q3pBSkJnTlZCQVlUQWs1TU1Sa3dGd1lEVlFRRERCQklWbElnUlhoaGJYQnNaU0JMClpYbHpN
-      SUlCSURBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVEwQU1JSUJDQUtDQVFFQXB4Q1hVUFN6cUJlVys5
-      ZFoKbkFTNndQRXJPWVZSYkxhRStleTZUTW84bWUzTldzY044aW1TQktjYnViVFA2ajFUNEd1VzhS
-      QVlaK3pJZGh4TQpRZmswYzRqMUR0NElPRll5UURIOFdHLzlxU3Rmc1psNjJOV2FwNXhDNWxFU0Mx
-      MmQ1dkRqOUp3LzRlV29oU3J4CnBsY3EveVh6SWNoVWdyaWkxbExKSlFEMHUyTWxDQmN3ZjVVQkIv
-      ZWFHa1U4SGZLMHU3MHhWcmtOYnJqYTRweSsKZFNJOS85VnFMWnpRNWZ1aGNhb1Q0WU9WbGpaUUpq
-      UTN1clpaTVVtUnRybWl1SEVpdGtqa3NTeXNkZDdaODI1LwpoNWI3bkMzdlJ0VTExVnk3N3VtT0FB
-      d2htbXJ3bitXb2JqZ0ZyenlvYWVwOVphV1dZY09mMTFKYUlnYk1WdUY1CklKTEUxd0lCQTZNck1D
-      a3dKd1lKWUlaSUFZYjRRZ0VOQkJvV0dFZGxibVZ5WVhSbFpDQmllU0JJVmxJZ05TNDMKTGpBdk9E
-      QU5CZ2txaGtpRzl3MEJBUXNGQUFPQ0FRRUFhckVVYjNxeUcya0dYM1VMNXJHSlo3eW1kTktUMTls
-      eQpLWnBLeWVCMjcvU1hPWVg3RDBITWNESlhlSk9vaGkvcmRBdGR2dXBiU3ZLK1dqSVR6amlSZ0Nw
-      em05ZmNyTlFyCi81RzdONVdKSDJOK3I4cStuZGNaVnhZTytBaHA0djBkVXdDcGlUeVI1dUhWZ1g1
-      VlpWSyttSFZjTllxalgxaG4KTUVqeW1yUVRwUHdWeEpSY2FKaE9peC9wcThadStmZzRqQ3FrNC9D
-      OTQzMjVPQnZ0ZEhXMkZ6UGZ4TERPM1pUSgpmVE5pTnV0VEM1MDMxZEc0SEJGWGtWdnAxenk3bDRx
-      U2ZVWG1YR0dSMkNETlhYaDVHeVJpWlpFQUlpSHBoR21LClMyUHZlREJPN1B1RDdCcWpqK1BkcE5x
-      UFdzVTN5M3dabHZhcjBkT3NKYWZXSmlYb2x0ay9wZz09Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0t
-      LS0K
-
 
 ######################################
 ## Condition definitions
@@ -185,39 +147,39 @@ Conditions:
 Mappings:
   RegionMap:
     eu-north-1:
-      AMI: ami-09c028d029aa47c59
+      AMI: ami-06b826f132b5f423a
     ap-south-1:
-      AMI: ami-05b45cb4d48b27c2c
+      AMI: ami-012e016a2a1906777
     eu-west-3:
-      AMI: ami-0d5190aced2bf17ec
+      AMI: ami-0437ef0a8e9311ef3
     eu-west-2:
-      AMI: ami-04cf781936ce8f63d
+      AMI: ami-03dd0b4724d92cd7b
     eu-west-1:
-      AMI: ami-0e8d392b3ddf9659b
+      AMI: ami-0569bc16a19b247a3
     ap-northeast-3:
-      AMI: ami-0e7913085a4c9b509
+      AMI: ami-0445dfdde3b121b64
     ap-northeast-2:
-      AMI: ami-0c0bae7a0dd8a5098
+      AMI: ami-0e544ffe3d58838ce
     ap-northeast-1:
-      AMI: ami-07d5ef58b1dbfdbeb
+      AMI: ami-09c75c50ce7aec21e
     sa-east-1:
-      AMI: ami-02654fc04ad5454e5
+      AMI: ami-0fb5f56b8c9a86914
     ca-central-1:
-      AMI: ami-049d7a3dfd3295ac1
+      AMI: ami-02be9479a96e57e7d
     ap-southeast-1:
-      AMI: ami-0a23712d215e8963d
+      AMI: ami-02abaf93b2099aa78
     ap-southeast-2:
-      AMI: ami-01e9fcbbfa56e4c60
+      AMI: ami-037a762f79651e419
     eu-central-1:
-      AMI: ami-0a302ce05f1f03bc5
+      AMI: ami-05e2c5f91c4c3c558
     us-east-1:
-      AMI: ami-05ceb67c8f00b6ae4
+      AMI: ami-0b2424d0d882ab9e6
     us-east-2:
-      AMI: ami-0ed20b612db8061af
+      AMI: ami-0a35c12ea7a0fb5e7
     us-west-1:
-      AMI: ami-02dbdb6715defb628
+      AMI: ami-0edcdc79dcbd4c922
     us-west-2:
-      AMI: ami-0ed596901365f3378
+      AMI: ami-0a762c354d9412d62
 
 
 ######################################
@@ -327,8 +289,8 @@ Resources:
           CidrIp: !Ref VPCCIDR
           Description: Allow outbound TCP access port 8080 in VPC
         - IpProtocol: tcp
-          FromPort: 4343
-          ToPort: 4343
+          FromPort: 4341
+          ToPort: 4341
           CidrIp: !Ref VPCCIDR
           Description: Allow outbound HVR Port Access in VPC
         ## Allow HTTPS Outbound
@@ -401,12 +363,10 @@ Resources:
           Fn::Base64: !Sub |
             #!/bin/bash -x
 
-            systemctl stop hvr.socket
-            systemctl disable hvr.socket
+            systemctl stop hvrhubserver.service
+            systemctl disable hvrhubserver.service
 
-            echo "${HVRPubKeyBase64}" | sed 's/\ //g' | base64 -d > /opt/hvr/hvr_home/lib/cert/hvrqs.pub_cert
-            chown hvr:hvr /opt/hvr/hvr_home/lib/cert/hvrqs.*
-            chmod 600 /opt/hvr/hvr_home/lib/cert/hvrqs.*
+            rm -rf /opt/hvr/hvr_config/etc
 
             function cfn_fail
             {

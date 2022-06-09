@@ -40,10 +40,16 @@ Metadata:
         Parameters:
           - TagEnvironment
       - Label:
-          default: Public and Private keys for HVR communication
+          default: Hubserver Public and Private keys for HVR communication
         Parameters:
           - HVRPubKeyBase64
           - HVRPrivKeyBase64
+      - Label:
+          default: Agent Public and Private keys for HVR communication
+        Parameters:
+          - HVRAgentPubKeyBase64
+          - HVRAgentPrivKeyBase64
+          - HVRAgentPrivKeyPasswordBase64
       - Label:
           default: Secrets Manager ARN for HVR License Key secret
         Parameters:
@@ -85,9 +91,15 @@ Metadata:
       TagEnvironment:
         default: Environment
       HVRPubKeyBase64:
-        default: Public Key (base64)
+        default: Hubserver Public Key (base64)
       HVRPrivKeyBase64:
-        default: Private Key (base64)
+        default: Hubserver Private Key (base64)
+      HVRAgentPubKeyBase64:
+        default: Agent Private Key (base64) 
+      HVRAgentPrivKeyBase64:
+        default: Agent Private Key (base64) 
+      HVRAgentPrivKeyPasswordBase64:
+        default: Agent Private Key Password (base64) 
       HVRLicenseSecret:
         default: License Key (Secret ARN)
       HubDatabaseUsername:
@@ -187,13 +199,13 @@ Parameters:
     Default: "dev"
 
   ## The default public key below is a sample public key, with corresponding private key being defined below.
-  ## These are used internally to allow secure communication between the HVR Hub and Agent.
+  ## These are used internally to allow secure communication with the Hubserver.
   ## Self Signed certificates are used - they can be generated with hvrsslgen utility or using openssl, example
-  ## openssl req -x509 -nodes -sha256 -days 365 -newkey rsa:2048 -keyout privkey.pem -out pub_cert.pem -subj "/C=XX/O=Self Signed/CN=Self Signed" -subject
+  ## openssl req -x509 -nodes -sha256 -days 365 -newkey rsa:2048 -keyout privkey.pem -out pub_cert.pem -subj "/C=XX/O=Self Signed/CN=Self Signed"
   ## Lambda does not include openssl anymore otherwise using a lambda function would work.
   HVRPubKeyBase64:
     Description: |
-      Specify HVR public key certificate (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.
+      Specify Hubserver public key certificate (to be entered as a base64 string) to be used for secure communication, a default key is provided for testing.
       A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert \| base64"
     Type: String
     NoEcho: true
@@ -226,8 +238,8 @@ Parameters:
 
   HVRPrivKeyBase64:
     Description: |
-      Specify HVR private key (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents - (hvr.pub_cert), a default key is provided for testing.
-      A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.pub_cert \| base64"
+      Specify Hubserver private key (to be entered as a base64 string) to be used for secure communication, a default key is provided for testing.
+      A method to get this string from your public certificate, is using the base64 utility, example: "cat hvr.priv_key \| base64"
     Type: String
     NoEcho: true
     Default: |
@@ -263,6 +275,106 @@ Parameters:
       S1c4bnpncVhvbksvYUZvcUVoWDB0S3V0Ci0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0K
 
 
+  ## The default public key below is a sample public key, with corresponding private key being defined below.
+  ## These are used internally to allow secure communication between the HVR Hub and Agent.
+  ## When starting an HVR Agent (hvragentlistener) a new set of private/public certificates are created and
+  ## stored in HVR_CONFIG/etc/hvragent.conf.  
+  ## As we want the agents to use specific set of keys, we provide these as input and during Agent instance creation
+  ## these values will be extracted from secrets manager and a new HVR_CONFIG/etc/hvragent.conf file will be created
+  HVRAgentPubKeyBase64:
+    Description: |
+      Specify HVR Agent Public key certificate (to be entered as a base64 string) to be used for secure communication between the hub and agents, a default key is provided for testing.
+    Type: String
+    NoEcho: true
+    Default: |
+      TFMwdExTMUNSVWRKVGlCRFJWSlVTVVpKUTBGVVJTMHRMUzB0Q2sxSlNVTXJha05EUVdWTFowRjNT
+      VUpCWjBsQ1FVUkJUa0puYTNGb2EybEhPWGN3UWtGUmMwWkJSRUZ5VFZOcmQwcDNXVVJXVVZGRVJF
+      TkNTVlpzU1djS1VWZGtiR0p1VVhOSlIyUnNZbTFXZVZsWVVteGFRMEoyWW1sQ2IyUnVTbWhhTWxa
+      MVpFUkJaVVozTUhsTmFrRXlUVVJuZVUxNlJYZE5la3BoUm5jd01BcE5ha0V5VFVSTmVVMTZSWGRO
+      ZWtwaFRVTnplRXRVUVc1Q1owNVdRa0ZOVFVsRmFGZFZhVUpDV2pKV2RXUkRkMmRhTWxaMVdsaEth
+      R1JIVm10SlJ6bDFDa2xIYURKamJVWnVXbGMxTUUxSlNVSkpSRUZPUW1kcmNXaHJhVWM1ZHpCQ1FW
+      RkZSa0ZCVDBOQlVUQkJUVWxKUWtOQlMwTkJVVVZCZURWcVNYZDJTVlVLTnpKTVFtZGFTM1pzUVRa
+      MlVraDVOa0ZNTldGd2NTdGFRV1pRUm5aUU0yWXZWbWcwUWt0b1kzZ3dhV2gxT0hGNldGSlFPWHBy
+      VFRCcmFqQklOalJJV0FwcVFrSlZTU3ROVEV4RVZIaFpTM1pHYjBoQ1drUkNWV3BwTnpWMlYyTlVZ
+      emhsTDB0R0wyUmlha0ozT1RSeU4wOHZlbU5SWms1MlVXSjRNVkV4Y3k4ekNuTkpaM2g0WkZOUlIw
+      dGhSM2RNTlUxR2Nrc3lWa0ZUVUdKRWEwcGhkbU5qSzA4d2FWVldjM0V4WVdoRWNrMVZjVkF3TVN0
+      dVZFVTNkRlpuUTFFMlQxZ0tWMnhKU21OWWJYbEpibXNyVWtobVV6Qk9SREpqVkVsbVVqSk1LM1Z2
+      VHprdlJXeGpUR0ZuUTBkVE5sQmxhRmgyVDJsSmMyWTVabmhCUzAxU1FrRm5Rd3BCYXpNMGNFeDRW
+      M2xSWTBwdGFtMHhXbkZaU21sclFXSnhTWGszVjBsTVkxRXlNVUZZTTJWRE5WUk9OSEJ0WlRGemQz
+      bGhaQzl0YWpKbFdsTmFWR3g2Q2t0dmNHNU5VR2RqTDBwRE1qWlJTVUpCTmsxeVRVTnJkMHAzV1Vw
+      WlNWcEpRVmxpTkZGblJVNUNRbTlYUjBWa2JHSnRWbmxaV0ZKc1drTkNhV1ZUUWtrS1ZteEpaMDVw
+      TkhoTWFrRjJUbFJCVGtKbmEzRm9hMmxIT1hjd1FrRlJjMFpCUVU5RFFWRkZRV1J5Tkhaak5FWlZO
+      WFpIUzNGbkwzVklla2RrU2xOS1VRcHNaV014Y1VSMGFYTndObGR2VmtremJXaHZWVGRLWmxZNFZY
+      RlRkMjEyVWtGbllVdGpNV1JPV1Vjd1VIUXpSekpYTTNZd1NuRklhV1pqV21Od1FWcEpDalo1WlZo
+      d1FtcEVVM0Z4VEZwdGJuVjJiSGQyUld0RGRuRmlZV0l4VXpoMFZWcHNVMlpZTTJaS01UVnVjSEJa
+      VWtONWNGUnlla3BKUzB4U1dVOTJVbFFLTlRaSVUydHdiSE5hY0U5U2JESldhRWxqYzJVNFkzbE9W
+      VVIxUldoYVRIZFZVMGhRV0ZVeFVFVnVUVk5XU1daQmFubEtORmh3VGpoUmFUWnRNVTB5VUFwQmQy
+      YzNObmRwU0dkd1ZWaE1OVWhNZGt4clYyOUtkazF0UjJvMlUwUjZRWGhNVG5SSVMyZFpkMmxEUjFw
+      bU5rWk1NUzluUkV4YWRrbzNaamhtU25WbkNuWlBVRnBMU0c5b00yeDNaakJJV1hoQ1VYbE9lV1o2
+      UWxGVmEwSjJORTU0UzFnd1RVNUdhRkIwTVVaeEswOTZjWGhxZUZGTFFsQlJaREpoYzJkUlBUMEtM
+      UzB0TFMxRlRrUWdRMFZTVkVsR1NVTkJWRVV0TFMwdExRbz0K
+
+  HVRAgentPrivKeyBase64:
+    Description: |
+      Specify HVR Agent Private key (to be entered as a base64 string) to be used for secure communication between the hub and agents, a default key is provided for testing.
+    Type: String
+    NoEcho: true
+    Default: |
+      TFMwdExTMUNSVWRKVGlCRlRrTlNXVkJVUlVRZ1VGSkpWa0ZVUlNCTFJWa3RMUzB0TFFwTlNVbEdU
+      RlJDV0VKbmEzRm9hMmxIT1hjd1FrSlJNSGRUYWtGd1FtZHJjV2hyYVVjNWR6QkNRbEYzZDBoQlVV
+      bDBTM2wwUmpWT09GUXZNRU5CWjJkQkNrMUJkMGREUTNGSFUwbGlNMFJSU1VwQ1VVRjNTRkZaU2xs
+      SldrbEJWMVZFUWtGRmNVSkNRa0pTZUZoTFpIaE5ObGxSWjBGR1pVOVJNMHR0WmtKSlNVVUtNRTVJ
+      ZEd3cmJERkdXRUV4Tm13M1NURjFkVzQzYkdoeE5VcDZjMkZIZWpoMU1uWXpMM0ZVVWxWak9UWk1k
+      VUkyUmprNGQyVklOaXRNYnpWalEySjVVZ3BhVWxOVlRGVlVjVGxPVFU0MFJHdEZTVTE2TTNCQ2Ns
+      VmtSRU5NZFRsMFdFTXhOMFV4WlhaeEx5OHpiRVZsYVRZeFkzQnhZazlMYW1rd00zcDRZMndyQ25K
+      UVFqWnpSalZ3Y2pGRk1XOWpRemxTWTBWSFJuTktUM2hZTkRGc1JtZ3dhVFZuTVhCcGNFcDJPSFpJ
+      U1hCb2JUVmpNV1JGUVRsWFMwRlBkaTgyUjJVS1kyVktUVGR5VTNaUFVYUXJZemN6VWtablpsQmxL
+      MmhXZEVsellURktNM2RIVEdoV1FWWmpaVzVEWTFZdlJuZ3hkMmx1VERVd1Z6QkJiR2hCTlV4eVVn
+      cG9XRTAzVVVoaWFWUXdSMjR6UWtFdmFEVk5ZVmt4T0ZWak5XSTFaWFZQTTBzdkszTm5jakJYVGtG
+      cGFEQkhRVmRWY2pKb2NtSnRaMEo2UjBob2JraFJDaXRGYkhOVGNERjJRMVpuWVhGRmNIRm5NR1JT
+      YzA0MU0xRlFkVk5LTkZCUE1rOXNUR1Y2VmtaaFZrOTVVRXh4VjBnMk9XbDRXbWhtYW5CNk5XdHRV
+      QzhLZWs5MmJtSjJTVkpKY3pCMWQwWnpNR0l3ZEUxa1MwcEdXa1pGZG10U2RFTTVaM2hFTWxCd2Qy
+      cG9ZMEZuVmpSV1kzWnhNMnhQZW1odk5GWkJOWEJrUVFwWmRXRjZiRU5zVFU5VmVFNUtSekp4Y21o
+      Q0t6Vm1iMnhWT0VKU1NHVjVZbHBtY0Vsck0xZHRja0pCYWpST2MwSXlOVzEzVVdSaVRFSlJlakpU
+      VDBOR0NsVlRhamh3UmpKTU1VVk5jM05ZU0RsUmJFZEJMMnd6WVRWMVp6bHdhazExV0U4dlRHTTBT
+      SFk1WXpkVlRUSTVaM3BOWVhoUWVXMUNTMWh3TW1Oek1rWUtLMlJZU1VGdE9TOUVObmhwYVVRd2Qw
+      VnNabTlZVG5neVQzSkNNbmRQUTNaNFFsSlhVbGhoYzFJclQwUnBORlE0VDJsSVFqVldZekJCY1Za
+      S1QzWlZWUXBJS3pKT2VWVjVlRTkyVUdVdlUwVnhZbFkzUTFBeVZqVlpOSGR6VUVaMVN6RjFabHBP
+      VkRKVFJIQXZkVXB1UkU1UUwxTTFSMXBsZGtSc01DOUlTSE5NQ205SVFUTnVaa3BHTkVVNVZqTlZX
+      a3RDY2twTU9ERnViVUoyYnpocWF6SnRNRFZUVG1kb1UzVnFiR05XTWtNeWRHZE1PVWxTVVdGSWIz
+      VjViRE52VEZZS2EwTk9TRkkzUWpCSk1tNUVkVmxaZVV0ek9FMXNVVXRsVGtwVVFXdE1iV0ZsZWxW
+      NWIzVnFjRGxrVkd4dlRtTlRZV0ZRWTFaNGRFdHNUak53V1Vob1dRcEROM0ZGTlU1cFlWVnJjVlY2
+      UTBGdFZ6TnVObkJIY0M5VFVIUTFTVk51WWpsblZWVjZXa3hQWmxONE9YTnZWekpDWVRWbFVWZGxZ
+      VzV3ZFRSM1VXOWlDamhZYkdoNFQxZDFSblZFTWtVeFNGVlNUVGhPZEd3NVNHWkJTMlJQUm5OVWRH
+      bFVUVnByWVVsSFREY3ZWRmRzYTBkSFFUY3dXbEYzWmxrdk1VMUZTbUlLYlRacGJVYzRiVkEzTWpW
+      UVEyOVROMHB1VEhwRE1HdFFNVVYyY1VsNVRIWkZWR2RTVlVKWGRYcENjRGc0YkRKQmNWRkxPVzFZ
+      TmtOUEwwNUVRbkJhYndwcGRUTmhRWFZQUWpSNmJuRkZjMDQ1WkNzemVIRnBWblF6VEhBeE1XTlNT
+      MlU1ZEhJeWEwa3lhMGRYYlcxeWVERkNNSHAxTTJ4UlYzQkVlRGwwSzFwckNtNWpZVVJQU3lzemQw
+      ZDFRVWgyUnpsTU1XaExORFo2TkV4UFpXOW5aMHd4VEhGYVV6bE5hbkI0WkhRd2FDOVpTMXB6TUc5
+      RmFUWmxhRlY0YzAweFZGQUtVbmh5TTNkR2JWZHpibTE0V1hjMVNrdGpORE55Y0dKT05YZzBiR2RV
+      VFM5TVkwbG9SbUZSTTJWc1dUQkRVREJQUTA4MFJ5OW9UR1J3VkZFM1RVTTJad3ByYm5nMlZtcGpO
+      R2hUYmtwTmQwczNVV2hMY1VwaU9GWlFhVE55VDBrcldVTnhUVUl3WkdWdVMwNHlXbHBJUnpVelVr
+      b3dVaTlLTTBoR1l6Um1TSFYyQ204dlFtaHFiemcyYkUxcVVXaFFURU5OV1ZaSFpsVlJObTFYUzFj
+      cmExaG5NelUxVGxWTWJYaDVWV1ZCUzJWVk1YTlBWM05ZTDBaMVJVeG5kbGhTWjBRS1RESlNlbFUy
+      VGtScFprdFZNRWxIWTNnM2RYQXplRzFMZGtOSlJ6SXpaeXQ0ZW5OSGRuTlFaR2xRYWtjdmFUVnNZ
+      MFZpZWxsS2MyNXpMMlZZVVZkTk5BcE5XRFpJUjFseFNYUTFOVTFxUjI5TlFYb3hjVW93VlZZMk9I
+      VlZiQzgwV1ZZMmRuRTJibko1YmpSTWNHSTJkRzlSTmxwT01qZEJjM0JVU0dKNWNrRXdDbkpXTkVk
+      SlkwZFdWaTlQVGpGTEwxb3djbUZ6TUhSTWNYTmtUbWRyYkhWSVRYQlpRa1VyVjBveE5EVllWRmRL
+      UlVwaEx5czJka2MwV1VZcmVUQjVSbmtLYWtaRFNEWnVSRFJZV0hSNlFXNTFaRFprZEhVellYa3pS
+      VXAwY1dKM1NscGtja3B3TkM4eFkxVnZZMlpIYzBkb1NHTjRZMFZKYVdac2JWUjJSRXhRVmdwT1JF
+      dDNhMWhvVHl0SlRrWXZaMDlTWkZNM1JtaDRVMkZPTURaVU9WRnRPV3h3ZWk5blJXRmxSVlkzU3dv
+      dExTMHRMVVZPUkNCRlRrTlNXVkJVUlVRZ1VGSkpWa0ZVUlNCTFJWa3RMUzB0TFFvPQo=
+
+  HVRAgentPrivKeyPasswordBase64:
+    Description: |
+      Specify HVR Agent private key (to be entered as a base64 string) to be used for secure HVR communication between the HVR hub and agents. A default Private Key Password is provided for testing.
+      A method to get this string is using the base64 utility, example: "echo 'yout string' \| base64"
+    Type: String
+    NoEcho: true
+    Default: |
+      IXtvOitxcUQrWXM4U2ZrRkNwOUt6ZmNXdXI0bytSbzREMVdoQm9uWDJyZVZoQzROei9JV3VrdVpu
+      VEYyb2ZqZEFoR2Y5UGJKfSEK
+
   HVRLicenseSecret:
     Description: |
       Please specify the ARN to the AWS Secret (to be located in AWS Secrets Manager) that can be used for the HVR deployment.
@@ -270,7 +382,6 @@ Parameters:
       If you require a license please contact the HVR Software sales team and leave the value as "none".
     Type: String
     Default: "none"
-
 
   # Parameters below are specific to the HVR Hub Repository Database.
   # This should be ideally an RDS Aurora / PostgreSQL database
@@ -404,6 +515,7 @@ Resources:
   HVRLicKey:
     Type: AWS::SecretsManager::Secret
     Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRLicKey
       Description: HVR Quickstart License Key
       Tags:
         - Key: Name
@@ -418,6 +530,7 @@ Resources:
   HVRHubPublicCert:
     Type: "AWS::SecretsManager::Secret"
     Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRHubPublicCert
       Description: HVR Hub Public Certificate
       Tags:
         - Key: Name
@@ -431,10 +544,11 @@ Resources:
   HVRAdminUserPassword:
     Type: "AWS::SecretsManager::Secret"
     Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRAdminUserPassword
       Description: Autogenerated HVR WebUI Admin User Password
       GenerateSecretString:
         PasswordLength: 16
-        ExcludeCharacters: '"@/\'
+        ExcludePunctuation: true
       Tags:
         - Key: Name
           Value: !Sub HVRAdminUserPassword-${TagEnvironment}
@@ -442,11 +556,13 @@ Resources:
           Value: !Sub ${TagEnvironment}
 
   ## ------------------------------------------------------------ #
-  ## Create Secrets Manager Secret to hold the Private Key for HVR encrypted communication
+  ## Create Secrets Manager Secret to hold the Hubserver Private Key for HVR encrypted communication
+  ## with the hubserver HTTPS
   ## ------------------------------------------------------------ #
   HVRPrivKey:
     Type: "AWS::SecretsManager::Secret"
     Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRPrivKey
       Description: Private Key to be used for Secure HVR communication
       SecretString: !Ref HVRPrivKeyBase64
       Tags:
@@ -456,11 +572,12 @@ Resources:
           Value: !Sub ${TagEnvironment}
 
   ## ------------------------------------------------------------ #
-  ## Create Secrets Manager Secret to hold the Public Key for HVR encrypted communication
+  ## Create Secrets Manager Secret to hold the Hubserver Public Key for HVR encrypted communication
   ## ------------------------------------------------------------ #
   HVRPubKey:
     Type: "AWS::SecretsManager::Secret"
     Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRPubKey
       Description: Public Key to be used for Secure HVR communication
       SecretString: !Ref HVRPubKeyBase64
       Tags:
@@ -468,6 +585,52 @@ Resources:
           Value: !Sub hvrPubKey-${TagEnvironment}
         - Key: EnvironmentStage
           Value: !Sub ${TagEnvironment}
+
+  ## ------------------------------------------------------------ #
+  ## Create Secrets Manager Secret to hold the Agent Public Key for HVR encrypted communication
+  ## ------------------------------------------------------------ #
+  HVRAgentPubKey:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRAgentPubKey
+      Description: Agent Public Key to be used for Secure HVR communication
+      SecretString: !Ref HVRAgentPubKeyBase64
+      Tags:
+        - Key: Name
+          Value: !Sub hvrAgentPubKey-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+
+  ## ------------------------------------------------------------ #
+  ## Create Secrets Manager Secret to hold the Agent Private Key for HVR encrypted communication
+  ## ------------------------------------------------------------ #
+  HVRAgentPrivKey:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRAgentPrivKey
+      Description: Agent Private Key to be used for Secure HVR communication
+      SecretString: !Ref HVRAgentPrivKeyBase64
+      Tags:
+        - Key: Name
+          Value: !Sub hvrAgentPrivKey-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+
+  ## ------------------------------------------------------------ #
+  ## Create Secrets Manager Secret to hold the Agent Private Key Password for HVR encrypted communication
+  ## ------------------------------------------------------------ #
+  HVRAgentPrivKeyPassword:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Sub hvr/quickstart/${TagEnvironment}/HVRAgentPrivKeyPassword
+      Description: Agent Private Key Password to be used for Secure HVR communication
+      SecretString: !Ref HVRAgentPrivKeyPasswordBase64
+      Tags:
+        - Key: Name
+          Value: !Sub hvrPrivKeyPassword-${TagEnvironment}
+        - Key: EnvironmentStage
+          Value: !Sub ${TagEnvironment}
+
 
   ## ------------------------------------------------------------ #
   ## Create S3 Bucket to store NLB Access Logs
@@ -788,6 +951,10 @@ Resources:
         UserData:
           Fn::Base64: !Sub |
             #!/bin/bash -x
+
+            # log to console and /var/log/user-data.log for debugging
+            exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
             yum update -y
             yum install -y amazon-cloudwatch-agent
 
@@ -813,9 +980,6 @@ Resources:
 
             ## Now lets start the agent with above sample config
             /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/cloudwatch-agent.json -s
-
-            # log to console for debugging
-            # exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
 
             export HVR_HOME=/opt/hvr/hvr_home
             export HVR_CONFIG=/opt/hvr/hvr_config
@@ -993,6 +1157,10 @@ Resources:
         UserData: #  This code HVR as a systemd service.  unixODBC, mysql, postgres, snowflake, redshift, Then it signals completion:
           Fn::Base64: !Sub |
             #!/bin/bash -x
+            
+            # log to console and /var/log/user-data.log for debugging
+            exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+
             yum update -y
             yum install -y amazon-cloudwatch-agent
 
@@ -1019,38 +1187,43 @@ Resources:
             ## Now lets start the agent with above sample config
             /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/cloudwatch-agent.json -s
 
-            # log to console for debugging
-            # exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
+            export HVR_HOME=/opt/hvr/hvr_home
+            export HVR_CONFIG=/opt/hvr/hvr_config
+            export HVR_TMP=/opt/hvr/hvr_tmp
 
             # this host is capable of running hubserver, but is used only for agent.
             systemctl stop hvrhubserver.service
             systemctl disable hvrhubserver.service
 
             REGION=$(curl -s http://169.254.169.254/latest/dynamic/instance-identity/document | jq -r .region)
-            HVRUSERPWD=`aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRAdminUserPassword} --query 'SecretString' --output text`
-            ## set hvr user password, we use pub/priv cert and password together for hvr authentication
-            echo "hvr:$HVRUSERPWD" | chpasswd
 
             rm -rf /opt/hvr/hvr_config
             mkdir -p /opt/hvr/hvr_config/etc/cert
-            HUBCERT=`aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRHubPublicCert} --query 'SecretString' --output text`
-            if [ -z "$HUBCERT" ]
+            HUB_PUB_CERT=`aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRHubPublicCert} --query 'SecretString' --output text`
+            if [ -z "$HUB_PUB_CERT" ]
             then
              # if the certificate is not set yet, sleep for 60 sec and try again
              sleep 60
-             HUBCERT=`aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRHubPublicCert} --query 'SecretString' --output text`
+             HUB_PUB_CERT=`aws --region $REGION secretsmanager get-secret-value --secret-id ${HVRHubPublicCert} --query 'SecretString' --output text`
             fi
 
-            echo $HUBCERT | base64 -d > /opt/hvr/hvr_config/etc/cert/hvrhubserver.pub_cert
-            chown -R hvr:hvr /opt/hvr/hvr_config
-            chmod 0644 /opt/hvr/hvr_config/etc/cert/hvrhubserver.pub_cert
+            AGENT_PUB_CERT=`aws secretsmanager get-secret-value --secret-id ${HVRAgentPubKey} --query 'SecretString' --output text | base64 -d`
+            AGENT_PRIV_KEY=`aws secretsmanager get-secret-value --secret-id ${HVRAgentPrivKey} --query 'SecretString' --output text | base64 -d`
+            AGENT_PRIV_KEY_PASS=`aws secretsmanager get-secret-value --secret-id ${HVRAgentPrivKeyPassword} --query 'SecretString' --output text | base64 -d`
 
-            # su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentconfig Setup_Mode_Timed_Until=now+24h"
-            su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentlistener -d 4343"
-            su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentconfig Only_From_Client_Public_Certificates.hvrhub=@/opt/hvr/hvr_config/etc/cert/hvrhubserver.pub_cert"
-            su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentconfig Anonymous_Access.allow=true"
-            su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentlistener -k 4343"
-            su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentconfig Setup_Mode_Timed_Until="
+            cat << EOF > $HVR_CONFIG/etc/hvragent.conf
+            {
+              "Agent_Server_Public_Certificate": "$AGENT_PUB_CERT",
+              "Agent_Server_Private_Key": "$AGENT_PRIV_KEY",
+              "Agent_Server_Private_Key_Password": "$AGENT_PRIV_KEY_PASS",
+              "Only_From_Client_Public_Certificates": {"hub": "$HUB_PUB_CERT"},
+              "Anonymous_Access": {"allow": true}
+            }
+            EOF
+
+            chown -R hvr:hvr /opt/hvr/hvr_config
+
+            # Start Agent
             su - hvr -c "source .bash_profile; cd /opt/hvr/hvr_home/bin; ./hvragentlistener -d 4343"
 
             function cfn_fail
@@ -1305,6 +1478,9 @@ Resources:
                   - !Ref HVRPubKey
                   - !Ref HVRAdminUserPassword
                   - !Ref HVRHubPublicCert
+                  - !Ref HVRAgentPubKey
+                  - !Ref HVRAgentPrivKey
+                  - !Ref HVRAgentPrivKeyPassword
                   - !If
                       - NoHVRLicenseProvided
                       -

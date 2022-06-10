@@ -891,7 +891,7 @@ Resources:
         - !Ref PrivateSubnet2
       MinSize: "2"
       MaxSize: "4"
-      Cooldown: "900"
+      Cooldown: "600"
       DesiredCapacity: "2"
       Tags:
         - Key: Name
@@ -1047,7 +1047,7 @@ Resources:
                     HVR_TMP=/opt/hvr/hvr_tmp \
                     ./hvrreposconfig -c"
 
-                    # Disable wallet                  
+                    # Configure the hvr wallet                  
                     su - hvr -c "cd /opt/hvr/hvr_home/bin; \
                     HVR_HOME=/opt/hvr/hvr_home \
                     HVR_CONFIG=/opt/hvr/hvr_config \

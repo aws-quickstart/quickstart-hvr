@@ -13,7 +13,7 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 * Two Network Load Balancers to direct traffic, one for the public subnets and one for the private subnets. Each Network Load Balancer is located within a security group.
 
 * In the public subnets:
-** A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL AMI in AWS Marketplace. With this bastion host, you can use the HVR graphical user interface to configure the HVR software components—the HVR hub and agents—in the private subnets.
+** A Linux bastion host in an Auto Scaling group that provides inbound Secure Shell (SSH) access to EC2 instances in public and private subnets. The bastion host is based on the HVR BYOL AMI in AWS Marketplace. With this bastion host, you can connect to the HVR Hubserver and configure the HVR software components — the hub and agents in the private subnets.
 ** A security group for limiting inbound and outbound traffic. For details, see link:#_restricted_port_access[Restricted port access] later in this guide.
 
 * In the private subnets:
@@ -22,7 +22,7 @@ As shown in <<architecture1>>, the Quick Start sets up the following:
 ** A security group for limiting inbound traffic. For details, see link:#_restricted_port_access[Restricted port access] later in this guide.
 
 * An Amazon Elastic File System (Amazon EFS) file system attached to the HVR hub instance for high availability. If the HVR hub instance fails, a new one is created and attached to the EFS file system.
-* (Optional) An Amazon Aurora PostgreSQL–compatible repository database for the HVR hub. This option includes multiple reader instances in one private subnet and one writer in the other private subnet. Alternatively, you can use an existing database. The database does not have to be PostgreSQL. Other supported databases include MySQL, MariaDB, SQL Server, and Oracle.
+* An Amazon Aurora PostgreSQL–compatible repository database for the HVR hub. This option includes multiple reader instances in one private subnet and one writer in the other private subnet. Alternatively, you can use an existing database as hub repository. The database does not have to be PostgreSQL. Other supported databases include MySQL, MariaDB, SQL Server, and Oracle.
 * AWS Secrets Manager for storing secrets, such as passwords used by the Quick Start. These secrets include database and operating system (EC2) user passwords, the HVR license, public keys, and private keys used for secure communication. The deployment process provides details that enable the HVR components to access and use these secrets.
 
 * (Optional) Amazon Simple Notification Service (Amazon SNS), which the Amazon Aurora PostgreSQL–compatible environment uses for alarms and event notifications.

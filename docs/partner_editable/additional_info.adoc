@@ -21,7 +21,7 @@
 
 When you log in to the bastion host, HVR hub, or HVR agent, you see a message on using the images. Review the message. Also read the readme file located in the HVR Linux user home directory: */home/hvr/hvr-readme.txt*.
 
-To start the HVR graphical user interface on the bastion host, connect to the host by using SSH with your supplied key pair. Connect as the HVR Unix user: `sudo su - hvr`. Then run `hvrwebdesktop`, and follow the instructions.
+To start the HVR web based user interface on the bastion host, connect to the host by using SSH with your supplied key pair. Connect as the "hvr" Unix user: `sudo su - hvr`. Then run `hvrwebdesktop`, and follow the instructions.  Once you are connected to the web desktop, you can use Firefox to open a connection to the HVR Hub.
 
 
 //Provide any other information of interest to users, especially focusing on areas where AWS or cloud usage differs from on-premises usage.
@@ -32,14 +32,16 @@ To start the HVR graphical user interface on the bastion host, connect to the ho
 * Inbound ports 22 and 8080 are open for connections to the bastion host.
 ** Port 22 is used for SSH access. You need a valid key pair to access the host.
 ** Port 8080 can be used to access the HVR web desktop to establish a remote connection to the HVR hub for configuration.
-* Outbound traffic is limited to ports 22, 8080, 4343, and 443.
-** The HVR hub and agents are behind Network Load Balancers using port 4343 for HVR communication.
-** The bastion host can connect to the hub and agents using port 4343 and 22 (SSH). SSH requires the specified key pair.
+* Outbound traffic is limited to ports 22, 8080, 4343, 4341, and 443.
+** The HVR hub is behind a Network Load Balancer using port 4341.
+** The HVR agents are behind Network Load Balancers using port 4343 for HVR communication between the Hub and the agents.
+** The bastion host can connect to the hub (port 4341) and agents using port 4343 and 22 (SSH). SSH requires the specified key pair.
 
 **In the private subnets:**
 
-*  Inbound ports are 4343, 22 and 2049.
-** Port 4343 is used for HVR communication.
+*  Inbound ports are 4341, 4343, 22 and 2049.
+** Port 4341 is used for HVR Hub communication.
+** Port 4343 is used for HVR Agent communication.
 ** Port 22 is used for SSH access. A valid key pair is required to access the host.
 ** Port 2049 is used for Amazon EFS.
 * Outbound traffic is not limited.

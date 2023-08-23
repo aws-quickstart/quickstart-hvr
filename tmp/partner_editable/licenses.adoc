@@ -1,0 +1,7 @@
+// Include details about any licenses and how to sign up. Provide links as appropriate. If no licenses are required, clarify that. The following paragraphs provide examples of details you can provide. Remove italics, and rephrase as appropriate.
+
+This Quick Start requires a subscription to the https://aws.amazon.com/marketplace/pp/B077YM8HPW[HVR for AWS - Bring Your Own License^] (BYOL) Amazon Machine Image (AMI) through AWS Marketplace. The HVR hub and agent instances use this AMI. This AMI has the HVR software and database drivers preinstalled and ready to use with your existing license.  
+
+You need a valid license key to deploy this stack. To obtain a license if you don't already have one, contact the HVR team at info@hvr-software.com or use the https://www.hvr-software.com[HVR Software website^]. Additional pricing, terms, and conditions may apply. For instructions, see the link:#_subscribe_to_the_hvr_ami[Subscribe to the HVR AMI] section in this guide.
+
+You must also create a Secrets Manager secret before you deploy this stack. This secret is the plaintext secret HVR license key. During deployment, you are asked to provide the ARN for this secret, which is located in Secrets Manager. If you deploy the Quick Start without supplying a license file, the process creates and uses an empty Secrets Manager secret. After you obtain your license, update this secret with the license details.

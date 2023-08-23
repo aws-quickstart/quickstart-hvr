@@ -1,5 +1,0 @@
-==== Prepare for the deployment
-
-To help secure communication between the HVR components—the HVR hub and agents—this deployment uses a private key and public certificate pair. The template provides a default pair that you can use. (For the default values, see the link:#_parameter_reference[Parameter reference] section of this guide under the parameters `HVRPubKeyBase64` and `HVRPrivKeyBase64`.) Use the default pair for evaluation only; when you deploy this Quick Start, generate your own pair. You can create these keys (private key and public key) using either OpenSSL or the HVR the *hvrsslgen* command. For details, see the https://www.hvr-software.com/docs/5/commands/hvrsslgen[HVR documentation^].
-
-Also before you deploy this Quick Start, create a Secrets Manager secret. This is a text secret that holds the full HVR license key. During deployment, you are asked to provide the ARN for this secret.

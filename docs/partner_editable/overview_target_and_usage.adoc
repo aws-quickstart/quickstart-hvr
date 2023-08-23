@@ -1,7 +1,0 @@
-This guide provides instructions for deploying the {partner-product-name} Quick Start reference architecture on the AWS Cloud.
-
-This Quick Start is for organizations that want to use HVR to replicate data between transactional databases and file systems. The architecture supports real-time change data capture (CDC) for databases, analytics, and migrations.
-
-For details on source and target configuration options supported by HVR, see the https://www.hvr-software.com/docs/5[HVR documentation^] or the https://www.hvr-software.com[HVR Software website^].
-
-//Marcia notes: Collecting data changes for analytics purposes. Want to analyze patterns in large data.

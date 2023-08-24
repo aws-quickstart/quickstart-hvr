@@ -1,3 +1,0 @@
-
-=== Parameters for deploying into a new VPC
-include::hvr-main-vpc.template.adoc[]

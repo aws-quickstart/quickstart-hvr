@@ -1,0 +1,5 @@
+This guide covers the information you need to deploy the {partner-product-name} Partner Solution in the AWS Cloud.
+
+This Partner Solution is for organizations that want to use HVR to replicate data between transactional databases and file systems. The architecture supports real-time change data capture (CDC) for databases, analytics, and migrations.
+
+For details on source and target configuration options supported by HVR, refer to the https://www.hvr-software.com/docs/5[HVR documentation^] or the https://www.hvr-software.com[HVR Software website^].
